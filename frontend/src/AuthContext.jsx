@@ -18,8 +18,8 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check for stored token and user name on app load
-    const storedToken = localStorage.getItem('dialed-in-token');
-    const storedUserName = localStorage.getItem('dialed-in-user-name');
+    const storedToken = localStorage.getItem('4aivr-token');
+    const storedUserName = localStorage.getItem('4aivr-user-name');
     if (storedToken && storedUserName) {
       setToken(storedToken);
       setUserName(storedUserName);
@@ -31,16 +31,16 @@ export const AuthProvider = ({ children }) => {
   const login = (accessToken) => {
     // Token to user mapping
     const tokenUserMap = {
-      'dialed-in-partner-access-2024': 'Skyler',
-      'dialed-in-business-partner-2024': 'Eden'
+      '4aivr-partner-access-2024': 'Skyler',
+      '4aivr-business-partner-2024': 'Eden'
     };
     
     if (tokenUserMap[accessToken]) {
       setToken(accessToken);
       setUserName(tokenUserMap[accessToken]);
       setIsAuthenticated(true);
-      localStorage.setItem('dialed-in-token', accessToken);
-      localStorage.setItem('dialed-in-user-name', tokenUserMap[accessToken]);
+      localStorage.setItem('4aivr-token', accessToken);
+      localStorage.setItem('4aivr-user-name', tokenUserMap[accessToken]);
       return true;
     }
     return false;
@@ -50,8 +50,8 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUserName('');
     setIsAuthenticated(false);
-    localStorage.removeItem('dialed-in-token');
-    localStorage.removeItem('dialed-in-user-name');
+    localStorage.removeItem('4aivr-token');
+    localStorage.removeItem('4aivr-user-name');
   };
 
   const getAuthHeaders = () => {

@@ -10,7 +10,7 @@ const UserSettings = ({ onClose }) => {
 
   useEffect(() => {
     // Load existing API key for this user
-    const savedApiKey = localStorage.getItem(`dialed-in-api-key-${token}`);
+    const savedApiKey = localStorage.getItem(`4aivr-api-key-${token}`);
     if (savedApiKey) {
       setApiKey(savedApiKey);
     }
@@ -36,7 +36,7 @@ const UserSettings = ({ onClose }) => {
     }
 
     // Save API key for this user
-    localStorage.setItem(`dialed-in-api-key-${token}`, apiKey);
+    localStorage.setItem(`4aivr-api-key-${token}`, apiKey);
     setSuccess('API key saved successfully! You can now search for leads using your own Google Places quota.');
     setLoading(false);
   };
@@ -77,13 +77,13 @@ const UserSettings = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 w-full max-w-2xl mx-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-white">User Settings</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 sm:p-6 w-full max-w-2xl">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-bold text-white">User Settings</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-xl"
+            className="text-gray-400 hover:text-white text-xl p-2 touch-manipulation"
           >
             ×
           </button>
@@ -107,7 +107,7 @@ const UserSettings = ({ onClose }) => {
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder="AIzaSy..."
-                  className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+                  className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
                 />
               </div>
 
@@ -123,11 +123,11 @@ const UserSettings = ({ onClose }) => {
                 </div>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded transition-colors"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-3 sm:py-2 rounded-lg transition-colors touch-manipulation text-base sm:text-sm font-medium"
                 >
                   {loading ? 'Saving...' : 'Save API Key'}
                 </button>
@@ -136,7 +136,7 @@ const UserSettings = ({ onClose }) => {
                   type="button"
                   onClick={handleTestApiKey}
                   disabled={loading || !apiKey.trim()}
-                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-2 rounded transition-colors"
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-3 sm:py-2 rounded-lg transition-colors touch-manipulation text-base sm:text-sm font-medium"
                 >
                   Test API Key
                 </button>

@@ -13,7 +13,7 @@ async function searchPlaces(city, category, apiKey, maxLeads = 25) {
     const primaryTerm = `${category} ${city}`;
     console.log(`🔍 Searching for: ${primaryTerm}`);
     
-    const allLeads = await fetchGooglePlacesData(primaryTerm, GOOGLE_PLACES_API_KEY);
+    const allLeads = await fetchGooglePlacesData(primaryTerm, GOOGLE_PLACES_API_KEY, maxLeads);
     console.log(`✅ Found ${allLeads.length} real businesses`);
     
     if (allLeads.length === 0) {
@@ -79,44 +79,79 @@ function generateSearchTerms(city, category) {
   return searchTerms;
 }
 
-// Fetch data from Google Places API (New) Text Search
-async function fetchGooglePlacesData(query, apiKey) {
+// Fetch data from Google Places API (New) Text Search with pagination support
+async function fetchGooglePlacesData(query, apiKey, maxLeads = 25) {
   const url = 'https://places.googleapis.com/v1/places:searchText';
+  const allPlaces = [];
+  let nextPageToken = null;
+  const maxRequestsPerSearch = Math.min(Math.ceil(maxLeads / 20), 10); // Limit to 10 requests max (200 results)
+  let requestCount = 0;
   
-  const requestBody = {
-    textQuery: query,
-    maxResultCount: 20
-  };
+  console.log(`🔍 Fetching up to ${maxLeads} leads with pagination...`);
   
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Goog-Api-Key': apiKey,
-      'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.id'
-    },
-    body: JSON.stringify(requestBody)
-  });
+  do {
+    const requestBody = {
+      textQuery: query,
+      maxResultCount: 20, // Google Places API (New) max per request
+      locationBias: {
+        rectangle: {
+          low: { latitude: 25.7617, longitude: -80.1918 }, // Miami area - will be dynamic later
+          high: { latitude: 25.7817, longitude: -80.1718 }
+        }
+      }
+    };
+    
+    // Add pagination token if available
+    if (nextPageToken) {
+      requestBody.pageToken = nextPageToken;
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.websiteUri,places.nationalPhoneNumber,nextPageToken'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Google Places API Error:', errorText);
+      throw new Error(`Google Places API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.places && data.places.length > 0) {
+      const mappedPlaces = data.places.map(place => ({
+        name: place.displayName?.text || 'Unknown Business',
+        address: place.formattedAddress || 'Address not available',
+        rating: place.rating || null,
+        reviewCount: place.userRatingCount || 0,
+        googlePlaceId: place.id,
+        phone: place.nationalPhoneNumber || null,
+        website: place.websiteUri || null
+      }));
+      
+      allPlaces.push(...mappedPlaces);
+      console.log(`📍 Batch ${requestCount + 1}: Found ${mappedPlaces.length} places (Total: ${allPlaces.length})`);
+    }
+    
+    // Check for next page token
+    nextPageToken = data.nextPageToken || null;
+    requestCount++;
+    
+    // Add small delay between requests to avoid rate limiting
+    if (nextPageToken && requestCount < maxRequestsPerSearch) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+  } while (nextPageToken && requestCount < maxRequestsPerSearch && allPlaces.length < maxLeads);
   
-  const data = await resp.json();
-  
-  if (!data.places || data.places.length === 0) {
-    return [];
-  }
-  
-  if (data.error) {
-    console.log(`⚠️ Google Places API error: ${data.error.message}`);
-    return [];
-  }
-  
-  return data.places.map(place => ({
-    name: place.displayName?.text || 'Unknown',
-    rating: place.rating || null,
-    reviewCount: place.userRatingCount || null,
-    address: place.formattedAddress || 'Unknown',
-    googlePlaceId: place.id,
-    source: 'google_places_new_api'
-  }));
+  console.log(`✅ Pagination complete: ${allPlaces.length} total places found in ${requestCount} requests`);
+  return allPlaces;
 }
 
 // Simple duplicate removal based on Google Place ID

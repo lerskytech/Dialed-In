@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import LoginPage from './LoginPage';
 import UserSettings from './UserSettings';
+import logo from './assets/4AIVR.png';
 
 function App() {
   const { isAuthenticated, loading: authLoading, getAuthHeaders, logout, userName, token } = useAuth();
@@ -96,7 +97,7 @@ function App() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `dialed-in-leads-${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `4aivr-leads-${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     
     setSuccess(`Downloaded ${leads.length} leads as CSV`);
@@ -131,7 +132,7 @@ function App() {
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `dialed-in-leads-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `4aivr-leads-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     
     setSuccess(`Downloaded ${leads.length} leads as JSON`);
@@ -149,7 +150,7 @@ function App() {
       setError(null);
       setSuccess(null);
 
-      const userApiKey = localStorage.getItem(`dialed-in-api-key-${token}`);
+      const userApiKey = localStorage.getItem(`4aivr-api-key-${token}`);
       
       const response = await fetch('/api/search', {
         method: 'POST',
@@ -210,43 +211,45 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <header className="text-center mb-12">
-          <div className="flex justify-between items-center mb-4">
-            <div className="text-left">
+        <header className="text-center mb-8 md:mb-12">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 sm:gap-0">
+            <div className="text-center sm:text-left">
               <div className="text-sm text-gray-400">Logged in as:</div>
               <div className="text-lg font-semibold text-white">{userName}</div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={() => setShowSettings(true)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm transition-colors"
+                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded text-sm transition-colors touch-manipulation"
               >
-                ⚙️ Settings
+                ⚙️ <span className="hidden sm:inline">Settings</span>
               </button>
               <button
                 onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded text-sm transition-colors touch-manipulation"
               >
-                Logout
+                <span className="sm:hidden">👋</span><span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           </div>
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-white mb-4">Dialed-In</h1>
-            <p className="text-xl text-gray-300">Premium Lead Generation System</p>
+          <div className="mb-6 md:mb-8">
+            <div className="flex items-center justify-center mb-2">
+              <img src={logo} alt="4AIVR Logo" className="h-24 sm:h-32 md:h-36 w-auto" />
+            </div>
+            <p className="text-lg sm:text-xl text-gray-300">Premium Lead Generation System</p>
           </div>
         </header>
 
         {/* Search Form */}
-        <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             {/* City Dropdown */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">City</label>
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none"
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
               >
                 <option value="">Select a city...</option>
                 {cityOptions.map(option => (
@@ -261,7 +264,7 @@ function App() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none"
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
               >
                 <option value="">Select a category...</option>
                 {categoryOptions.map(option => (
@@ -276,22 +279,25 @@ function App() {
               <select
                 value={maxLeads}
                 onChange={(e) => setMaxLeads(parseInt(e.target.value))}
-                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none"
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
               >
                 <option value={10}>10 leads (~$0.17)</option>
                 <option value={25}>25 leads (~$0.43)</option>
                 <option value={50}>50 leads (~$0.85)</option>
                 <option value={100}>100 leads (~$1.70)</option>
                 <option value={200}>200 leads (~$3.40)</option>
+                <option value={500}>500 leads (~$8.50)</option>
+                <option value={1000}>1000 leads (~$17.00)</option>
+                <option value={2000}>2000 leads (~$34.00)</option>
               </select>
             </div>
 
             {/* Search Button */}
-            <div className="flex items-end">
+            <div className="flex items-end sm:col-span-2 lg:col-span-1">
               <button
                 onClick={handleSearch}
                 disabled={searching || !city || !category}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-medium py-3 sm:py-2 px-4 rounded-lg transition-colors touch-manipulation text-base sm:text-sm"
               >
                 {searching ? 'Searching...' : 'Find New Leads'}
               </button>
@@ -312,24 +318,24 @@ function App() {
         </div>
 
         {/* Leads Display */}
-        <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-6">
-          <div className="flex justify-between items-center mb-4">
+        <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 sm:gap-0">
             <h2 className="text-xl font-bold text-white">
               Generated Leads ({leads.length})
             </h2>
             {leads.length > 0 && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
                 <button
                   onClick={downloadCSV}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                  className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 touch-manipulation"
                 >
-                  📊 Download CSV
+                  📊 <span className="hidden sm:inline">Download </span>CSV
                 </button>
                 <button
                   onClick={downloadJSON}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                  className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 touch-manipulation"
                 >
-                  📋 Download JSON
+                  📋 <span className="hidden sm:inline">Download </span>JSON
                 </button>
               </div>
             )}
@@ -344,93 +350,174 @@ function App() {
               <div className="text-gray-400">No leads found. Start by searching for leads above.</div>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-slate-600">
-                    <th className="px-4 py-3 text-gray-300 font-semibold">Business</th>
-                    <th className="px-4 py-3 text-gray-300 font-semibold">Rating</th>
-                    <th className="px-4 py-3 text-gray-300 font-semibold">Value</th>
-                    <th className="px-4 py-3 text-gray-300 font-semibold">Phone</th>
-                    <th className="px-4 py-3 text-gray-300 font-semibold">Website</th>
-                    <th className="px-4 py-3 text-gray-300 font-semibold">City</th>
-                    <th className="px-4 py-3 text-gray-300 font-semibold">Found by</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leads.map((lead, index) => (
-                    <tr key={lead.id || index} className="border-b border-slate-700 hover:bg-slate-700/50">
-                      <td className="px-4 py-3">
-                        <div className="font-medium">
-                          <a 
-                            href={`https://www.google.com/maps/search/${encodeURIComponent(lead.name + ' ' + lead.address)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-400 hover:text-blue-300 hover:underline cursor-pointer"
-                          >
-                            {lead.name}
-                          </a>
-                        </div>
-                        <div className="text-sm" style={{color: '#ffffff'}}>{lead.address}</div>
-                      </td>
-                      <td className="px-4 py-3">
+            <>
+              {/* Mobile Card Layout */}
+              <div className="block lg:hidden space-y-4">
+                {leads.map((lead, index) => (
+                  <div key={lead.id || index} className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 space-y-3">
+                    {/* Business Name & Address */}
+                    <div>
+                      <a 
+                        href={`https://www.google.com/maps/search/${encodeURIComponent(lead.name + ' ' + lead.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-lg font-semibold text-blue-400 hover:text-blue-300 hover:underline block mb-1 touch-manipulation"
+                      >
+                        {lead.name}
+                      </a>
+                      <div className="text-sm text-white mb-2">{lead.address}</div>
+                      <div className="text-sm text-white">{lead.city}</div>
+                    </div>
+                    
+                    {/* Rating & Value */}
+                    <div className="flex justify-between items-center">
+                      <div>
                         {lead.rating ? (
-                          <div>
-                            <div className="text-yellow-400">★ {lead.rating}</div>
-                            <div className="text-xs text-gray-400">({lead.reviewCount} reviews)</div>
-                          </div>
+                          <div className="text-yellow-400 text-sm">★ {lead.rating} ({lead.reviewCount} reviews)</div>
                         ) : (
-                          <span className="text-gray-500">No rating</span>
+                          <span className="text-gray-500 text-sm">No rating</span>
                         )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          lead.valueTier === 'Premium' ? 'bg-purple-700 text-purple-100' :
-                          lead.valueTier === 'High' ? 'bg-blue-700 text-blue-100' :
-                          lead.valueTier === 'Medium' ? 'bg-green-700 text-green-100' :
-                          'bg-gray-700 text-gray-100'
-                        }`}>
-                          {lead.valueTier || 'Standard'} ({lead.valueScore || 0})
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        lead.valueTier === 'Premium' ? 'bg-purple-700 text-purple-100' :
+                        lead.valueTier === 'High' ? 'bg-blue-700 text-blue-100' :
+                        lead.valueTier === 'Medium' ? 'bg-green-700 text-green-100' :
+                        'bg-gray-700 text-gray-100'
+                      }`}>
+                        {lead.valueTier || 'Standard'}
+                      </span>
+                    </div>
+                    
+                    {/* Contact Info */}
+                    <div className="flex gap-4">
+                      <div className="flex-1">
                         {lead.phone ? (
-                          <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300">
-                            {lead.phone}
+                          <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm block touch-manipulation">
+                            📞 {lead.phone}
                           </a>
                         ) : (
-                          <span className="text-gray-500">No phone</span>
+                          <span className="text-gray-500 text-sm">📞 No phone</span>
                         )}
-                      </td>
-                      <td className="px-4 py-3">
+                      </div>
+                      <div className="flex-1">
                         {lead.website ? (
                           <a 
                             href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1"
+                            className="text-green-400 hover:text-green-300 hover:underline text-sm block touch-manipulation"
                           >
                             🌐 Website
                           </a>
                         ) : (
-                          <span className="text-gray-500">No website</span>
+                          <span className="text-gray-500 text-sm">🌐 No website</span>
                         )}
-                      </td>
-                      <td className="px-4 py-3" style={{color: '#ffffff'}}>{lead.city}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          lead.contributedBy === 'Skyler' ? 'bg-blue-700 text-blue-100' :
-                          lead.contributedBy === 'Eden' ? 'bg-green-700 text-green-100' :
-                          'bg-gray-700 text-gray-100'
-                        }`}>
-                          {lead.contributedBy || 'Unknown'}
-                        </span>
-                      </td>
+                      </div>
+                    </div>
+                    
+                    {/* Found By */}
+                    <div className="flex justify-end">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        lead.contributedBy === 'Skyler' ? 'bg-blue-700 text-blue-100' :
+                        lead.contributedBy === 'Eden' ? 'bg-green-700 text-green-100' :
+                        'bg-gray-700 text-gray-100'
+                      }`}>
+                        Found by {lead.contributedBy || 'Unknown'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Desktop Table Layout */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-slate-600">
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Business</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Rating</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Value</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Phone</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Website</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">City</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Found by</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {leads.map((lead, index) => (
+                      <tr key={lead.id || index} className="border-b border-slate-700 hover:bg-slate-700/50">
+                        <td className="px-4 py-3">
+                          <div className="font-medium">
+                            <a 
+                              href={`https://www.google.com/maps/search/${encodeURIComponent(lead.name + ' ' + lead.address)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:text-blue-300 hover:underline cursor-pointer"
+                            >
+                              {lead.name}
+                            </a>
+                          </div>
+                          <div className="text-sm" style={{color: '#ffffff'}}>{lead.address}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          {lead.rating ? (
+                            <div>
+                              <div className="text-yellow-400">★ {lead.rating}</div>
+                              <div className="text-xs text-gray-400">({lead.reviewCount} reviews)</div>
+                            </div>
+                          ) : (
+                            <span className="text-gray-500">No rating</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            lead.valueTier === 'Premium' ? 'bg-purple-700 text-purple-100' :
+                            lead.valueTier === 'High' ? 'bg-blue-700 text-blue-100' :
+                            lead.valueTier === 'Medium' ? 'bg-green-700 text-green-100' :
+                            'bg-gray-700 text-gray-100'
+                          }`}>
+                            {lead.valueTier || 'Standard'} ({lead.valueScore || 0})
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          {lead.phone ? (
+                            <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300">
+                              {lead.phone}
+                            </a>
+                          ) : (
+                            <span className="text-gray-500">No phone</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {lead.website ? (
+                            <a 
+                              href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1"
+                            >
+                              🌐 Website
+                            </a>
+                          ) : (
+                            <span className="text-gray-500">No website</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3" style={{color: '#ffffff'}}>{lead.city}</td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            lead.contributedBy === 'Skyler' ? 'bg-blue-700 text-blue-100' :
+                            lead.contributedBy === 'Eden' ? 'bg-green-700 text-green-100' :
+                            'bg-gray-700 text-gray-100'
+                          }`}>
+                            {lead.contributedBy || 'Unknown'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>
