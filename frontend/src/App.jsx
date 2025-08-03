@@ -131,7 +131,7 @@ function App() {
           city, 
           category,
           maxLeads,
-          apiKey
+          userApiKey: apiKey
         })
       });
 
@@ -201,11 +201,9 @@ function App() {
               </button>
             </div>
           </div>
-          <div className="mb-6 md:mb-8">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-3xl font-bold text-white">Dialed-In</h1>
-              <span className="text-lg text-blue-200">Premium Lead Generation System</span>
-            </div>
+          <div className="mb-6 md:mb-8 text-center">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2">Dialed-In</h1>
+            <p className="text-lg sm:text-xl text-gray-300">Premium Lead Generation System</p>
           </div>
         </header>
 
