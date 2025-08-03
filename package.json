@@ -1,0 +1,12 @@
+{
+  "name": "LeadNavigatorAI-monorepo",
+  "private": true,
+  "scripts": {
+    "start-backend": "cd backend && node index.js",
+    "start-frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

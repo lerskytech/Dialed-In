@@ -1,0 +1,18 @@
+{
+  "name": "leadnavigatorai-backend",
+  "version": "1.0.0",
+  "description": "Backend for LeadNavigatorAI",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.3.16",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2",
+    "sqlite": "^5.0.1",
+    "sqlite3": "^5.1.6"
+  }
+}
