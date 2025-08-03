@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from './AuthContext';
-import LoginPage from './LoginPage';
 import UserSettings from './UserSettings';
-import logo from './assets/4AIVR.png';
+import LoginPage from './LoginPage';
 
 function App() {
   const { isAuthenticated, loading: authLoading, getAuthHeaders, logout, userName, token } = useAuth();
@@ -73,32 +72,19 @@ function App() {
       return;
     }
 
-    const headers = ['Business Name', 'Rating', 'Review Count', 'Value Tier', 'Value Score', 'Phone', 'Address', 'City', 'Category', 'Website', 'Found By', 'Date Added'];
+    const csvContent = "data:text/csv;charset=utf-8," + 
+      "Name,Rating,Reviews,Address,Phone,Website,Value Score,Value Tier,Contributed By\n" +
+      leads.map(lead => 
+        `"${lead.name}",${lead.rating},${lead.reviewCount},"${lead.address}","${lead.phone || ''}","${lead.website || ''}",${lead.valueScore},"${lead.valueTier}","${lead.contributedBy}"`
+      ).join("\n");
     
-    const csvData = leads.map(lead => [
-      lead.name || '',
-      lead.rating || '',
-      lead.reviewCount || '',
-      lead.valueTier || 'Standard',
-      lead.valueScore || 0,
-      lead.phone || '',
-      lead.address || '',
-      lead.city || '',
-      lead.category || '',
-      lead.website || '',
-      lead.contributedBy || 'Unknown',
-      lead.createdAt ? new Date(lead.createdAt).toLocaleDateString() : ''
-    ]);
-
-    const csvContent = [headers, ...csvData]
-      .map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `4aivr-leads-${new Date().toISOString().split('T')[0]}.csv`;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "dialed_in_leads.csv");
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
     
     setSuccess(`Downloaded ${leads.length} leads as CSV`);
   };
@@ -109,31 +95,13 @@ function App() {
       return;
     }
 
-    const exportData = {
-      exportDate: new Date().toISOString(),
-      totalLeads: leads.length,
-      exportedBy: userName,
-      leads: leads.map(lead => ({
-        businessName: lead.name,
-        rating: lead.rating,
-        reviewCount: lead.reviewCount,
-        valueTier: lead.valueTier || 'Standard',
-        valueScore: lead.valueScore || 0,
-        phone: lead.phone,
-        address: lead.address,
-        city: lead.city,
-        category: lead.category,
-        website: lead.website,
-        foundBy: lead.contributedBy,
-        dateAdded: lead.createdAt
-      }))
-    };
-
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `4aivr-leads-${new Date().toISOString().split('T')[0]}.json`;
+    const jsonContent = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(leads, null, 2));
+    const link = document.createElement("a");
+    link.setAttribute("href", jsonContent);
+    link.setAttribute("download", "dialed_in_leads.json");
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
     
     setSuccess(`Downloaded ${leads.length} leads as JSON`);
   };
@@ -150,7 +118,8 @@ function App() {
       setError(null);
       setSuccess(null);
 
-      const userApiKey = localStorage.getItem(`4aivr-api-key-${token}`);
+      // Load API key from localStorage based on user token
+      const apiKey = localStorage.getItem(`dialed-in-api-key-${token}`);
       
       const response = await fetch('/api/search', {
         method: 'POST',
@@ -162,7 +131,7 @@ function App() {
           city, 
           category,
           maxLeads,
-          userApiKey
+          apiKey
         })
       });
 
@@ -233,10 +202,10 @@ function App() {
             </div>
           </div>
           <div className="mb-6 md:mb-8">
-            <div className="flex items-center justify-center mb-2">
-              <img src={logo} alt="4AIVR Logo" className="h-24 sm:h-32 md:h-36 w-auto" />
+            <div className="flex items-center space-x-4">
+              <h1 className="text-3xl font-bold text-white">Dialed-In</h1>
+              <span className="text-lg text-blue-200">Premium Lead Generation System</span>
             </div>
-            <p className="text-lg sm:text-xl text-gray-300">Premium Lead Generation System</p>
           </div>
         </header>
 

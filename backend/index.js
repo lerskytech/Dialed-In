@@ -77,8 +77,8 @@ app.post('/api/search', async (req, res) => {
     // Get contributor name from token
     const authHeader = req.headers.authorization;
     const userToken = authHeader ? authHeader.replace('Bearer ', '') : 'anonymous';
-    const contributorName = userToken === '4aivr-partner-access-2024' ? 'Skyler' : 
-                           userToken === '4aivr-business-partner-2024' ? 'Eden' : 'Unknown';
+    const contributorName = userToken === 'dialed-in-partner-access-2024' ? 'Skyler' : 
+                           userToken === 'dialed-in-business-partner-2024' ? 'Eden' : 'Unknown';
     
     // Track actual new leads added (not duplicates)
     let newLeadsAdded = 0;

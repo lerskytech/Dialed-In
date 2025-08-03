@@ -23,8 +23,8 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-4">
       <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">4AIVR</h1>
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-white mb-8">Dialed-In Access</h2>
           <p className="text-gray-300">Premium Lead Generation System</p>
           <p className="text-sm text-gray-400 mt-2">Private Access Required</p>
         </div>

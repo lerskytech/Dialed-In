@@ -10,9 +10,11 @@ const UserSettings = ({ onClose }) => {
 
   useEffect(() => {
     // Load existing API key for this user
-    const savedApiKey = localStorage.getItem(`4aivr-api-key-${token}`);
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
+    if (token) {
+      const savedApiKey = localStorage.getItem(`dialed-in-api-key-${token}`);
+      if (savedApiKey) {
+        setApiKey(savedApiKey);
+      }
     }
   }, [token]);
 
