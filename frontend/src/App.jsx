@@ -16,8 +16,10 @@ function App() {
   const [filterCity, setFilterCity] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
-  const [city, setCity] = useState('');
-  const [category, setCategory] = useState('');
+  const [selectedCities, setSelectedCities] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [city, setCity] = useState(''); // Keep for backward compatibility
+  const [category, setCategory] = useState(''); // Keep for backward compatibility
   const [maxLeads, setMaxLeads] = useState(25);
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -211,9 +213,30 @@ function App() {
   };
 
   // Search function
+  // Helper functions for multi-selection
+  const toggleCitySelection = (cityValue) => {
+    setSelectedCities(prev => 
+      prev.includes(cityValue) 
+        ? prev.filter(c => c !== cityValue)
+        : [...prev, cityValue]
+    );
+  };
+
+  const toggleCategorySelection = (categoryValue) => {
+    setSelectedCategories(prev => 
+      prev.includes(categoryValue) 
+        ? prev.filter(c => c !== categoryValue)
+        : [...prev, categoryValue]
+    );
+  };
+
   const handleSearch = async () => {
-    if (!city || !category) {
-      setError('Please select both city and category');
+    // Support both single and multi-selection modes
+    const citiesToSearch = selectedCities.length > 0 ? selectedCities : (city ? [city] : []);
+    const categoriesToSearch = selectedCategories.length > 0 ? selectedCategories : (category ? [category] : []);
+    
+    if (citiesToSearch.length === 0 || categoriesToSearch.length === 0) {
+      setError('Please select at least one city and one category');
       return;
     }
 
@@ -232,8 +255,8 @@ function App() {
           ...getAuthHeaders()
         },
         body: JSON.stringify({ 
-          city, 
-          category,
+          cities: citiesToSearch,
+          categories: categoriesToSearch,
           maxLeads,
           userApiKey: apiKey
         })
@@ -314,33 +337,83 @@ function App() {
         {/* Search Form */}
         <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            {/* City Dropdown */}
+            {/* Multi-Select Cities */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">City</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Cities (Multi-Select)</label>
+              
+              {/* Selected Cities Display */}
+              {selectedCities.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {selectedCities.map(cityValue => {
+                    const cityLabel = cityOptions.find(opt => opt.value === cityValue)?.label || cityValue;
+                    return (
+                      <span key={cityValue} className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                        {cityLabel}
+                        <button 
+                          onClick={() => toggleCitySelection(cityValue)}
+                          className="hover:bg-blue-700 rounded-full w-4 h-4 flex items-center justify-center"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+              
+              {/* City Selection Dropdown */}
               <select
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
+                value=""
+                onChange={(e) => {
+                  if (e.target.value && !selectedCities.includes(e.target.value)) {
+                    toggleCitySelection(e.target.value);
+                  }
+                }}
                 className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm max-h-48 overflow-y-auto"
-                size="1"
               >
-                <option value="">Select a city...</option>
-                {cityOptions.map(option => (
+                <option value="">Add a city...</option>
+                {cityOptions.filter(option => !selectedCities.includes(option.value)).map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
             </div>
 
-            {/* Category Dropdown */}
+            {/* Multi-Select Categories */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Categories (Multi-Select)</label>
+              
+              {/* Selected Categories Display */}
+              {selectedCategories.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {selectedCategories.map(categoryValue => {
+                    const categoryLabel = categoryOptions.find(opt => opt.value === categoryValue)?.label || categoryValue;
+                    return (
+                      <span key={categoryValue} className="bg-green-600 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                        {categoryLabel}
+                        <button 
+                          onClick={() => toggleCategorySelection(categoryValue)}
+                          className="hover:bg-green-700 rounded-full w-4 h-4 flex items-center justify-center"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+              
+              {/* Category Selection Dropdown */}
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value=""
+                onChange={(e) => {
+                  if (e.target.value && !selectedCategories.includes(e.target.value)) {
+                    toggleCategorySelection(e.target.value);
+                  }
+                }}
                 className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm max-h-48 overflow-y-auto"
-                size="1"
               >
-                <option value="">Select a category...</option>
-                {categoryOptions.map(option => (
+                <option value="">Add a category...</option>
+                {categoryOptions.filter(option => !selectedCategories.includes(option.value)).map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
@@ -369,7 +442,7 @@ function App() {
             <div className="flex items-end sm:col-span-2 lg:col-span-1">
               <button
                 onClick={handleSearch}
-                disabled={searching || !city || !category}
+                disabled={searching || (selectedCities.length === 0 && !city) || (selectedCategories.length === 0 && !category)}
                 className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-medium py-3 sm:py-2 px-4 rounded-lg transition-colors touch-manipulation text-base sm:text-sm"
               >
                 {searching ? 'Searching...' : 'Find New Leads'}

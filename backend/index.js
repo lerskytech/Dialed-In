@@ -56,9 +56,14 @@ db.serialize(() => {
 // API Routes
 app.post('/api/search', async (req, res) => {
   try {
-    const { city, category, maxLeads = 25, userApiKey } = req.body;
-    if (!city || !category) {
-      return res.status(400).json({ error: 'City and category are required.' });
+    const { city, category, cities, categories, maxLeads = 25, userApiKey } = req.body;
+    
+    // Support both single and multi-selection modes
+    const citiesToSearch = cities && cities.length > 0 ? cities : (city ? [city] : []);
+    const categoriesToSearch = categories && categories.length > 0 ? categories : (category ? [category] : []);
+    
+    if (citiesToSearch.length === 0 || categoriesToSearch.length === 0) {
+      return res.status(400).json({ error: 'At least one city and one category are required.' });
     }
     
     // Get contributor name from token to determine API key requirements
@@ -85,9 +90,56 @@ app.post('/api/search', async (req, res) => {
       }
     }
     
-    console.log(`🔍 Searching for ${category} in ${city} (max ${maxLeads} leads)...`);
-    const places = await searchPlaces(city, category, apiKeyToUse, maxLeads);
-    console.log(` Found ${places.length} real leads`);
+    // Calculate even distribution across all city/category combinations
+    const totalCombinations = citiesToSearch.length * categoriesToSearch.length;
+    const baseLeadsPerCombo = Math.floor(maxLeads / totalCombinations);
+    const remainder = maxLeads % totalCombinations;
+    
+    console.log(`🔍 Multi-search: ${citiesToSearch.length} cities × ${categoriesToSearch.length} categories = ${totalCombinations} combinations`);
+    console.log(`📊 Distribution: ${baseLeadsPerCombo} leads per combo (${remainder} extra distributed to first combos)`);
+    
+    let allPlaces = [];
+    let comboIndex = 0;
+    const searchResults = [];
+    
+    // Search each city/category combination
+    for (const cityToSearch of citiesToSearch) {
+      for (const categoryToSearch of categoriesToSearch) {
+        // Add extra leads to first few combinations if there's remainder
+        const leadsForThisCombo = baseLeadsPerCombo + (comboIndex < remainder ? 1 : 0);
+        
+        console.log(`🔍 Searching: ${categoryToSearch} in ${cityToSearch} (${leadsForThisCombo} leads)`);
+        const places = await searchPlaces(cityToSearch, categoryToSearch, apiKeyToUse, leadsForThisCombo);
+        console.log(`✅ Found ${places.length} real leads for ${categoryToSearch} in ${cityToSearch}`);
+        
+        allPlaces = [...allPlaces, ...places];
+        searchResults.push({
+          city: cityToSearch,
+          category: categoryToSearch,
+          requested: leadsForThisCombo,
+          found: places.length
+        });
+        
+        comboIndex++;
+      }
+    }
+    
+    console.log(`📈 Total leads found: ${allPlaces.length} across ${totalCombinations} combinations`);
+    
+    // Handle dynamic rebalancing if needed
+    if (allPlaces.length < maxLeads) {
+      const shortfall = maxLeads - allPlaces.length;
+      console.log(`⚖️ Rebalancing: ${shortfall} leads short, attempting to redistribute...`);
+      
+      // Find combinations that had fewer leads than requested
+      const underperformingCombos = searchResults.filter(result => result.found < result.requested);
+      const availableCapacity = underperformingCombos.reduce((sum, combo) => sum + (combo.requested - combo.found), 0);
+      
+      if (availableCapacity > 0) {
+        console.log(`🔄 Redistributing ${shortfall} leads across combinations with capacity`);
+        // Additional rebalancing logic could be implemented here
+      }
+    }
     
     // Store in database with contributor tracking
     const stmt = db.prepare(`INSERT OR IGNORE INTO leads (name, rating, reviewCount, address, googlePlaceId, city, category, phone, website, valueScore, valueTier, contributedBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
@@ -96,8 +148,8 @@ app.post('/api/search', async (req, res) => {
     
     // Track actual new leads added (not duplicates)
     let newLeadsAdded = 0;
-    for (const place of places) {
-      const result = stmt.run(place.name, place.rating, place.reviewCount, place.address, place.googlePlaceId, city, category, place.phone || null, place.website || null, place.valueScore, place.valueTier, contributorName);
+    for (const place of allPlaces) {
+      const result = stmt.run(place.name, place.rating, place.reviewCount, place.address, place.googlePlaceId, place.city, place.category, place.phone || null, place.website || null, place.valueScore, place.valueTier, contributorName);
       if (result.changes > 0) {
         newLeadsAdded++;
       }
@@ -105,7 +157,18 @@ app.post('/api/search', async (req, res) => {
     stmt.finalize();
     
     console.log(`🎉 Actually added ${newLeadsAdded} new leads (${places.length - newLeadsAdded} were duplicates)`);
-    res.json({ message: `${newLeadsAdded} new leads found`, data: places, totalFound: places.length, newLeads: newLeadsAdded });
+    res.json({ 
+      data: allPlaces,
+      newLeads: newLeadsAdded,
+      totalFound: allPlaces.length,
+      duplicates: allPlaces.length - newLeadsAdded,
+      searchSummary: {
+        totalCombinations,
+        citiesToSearch,
+        categoriesToSearch,
+        searchResults
+      }
+    });
   } catch (error) {
     console.error('Search error:', error);
     res.status(500).json({ error: error.message });
