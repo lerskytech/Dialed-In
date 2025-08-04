@@ -529,7 +529,16 @@ function App() {
               
               {/* Desktop Table Layout */}
               <div className="hidden lg:block overflow-x-auto">
-                <table className="w-full text-left">
+                <table className="w-full text-left table-fixed">
+                  <colgroup>
+                    <col className="w-1/4" />
+                    <col className="w-1/8" />
+                    <col className="w-1/8" />
+                    <col className="w-1/8" />
+                    <col className="w-1/8" />
+                    <col className="w-1/8" />
+                    <col className="w-1/8" />
+                  </colgroup>
                   <thead>
                     <tr className="border-b border-slate-600">
                       <th className="px-4 py-3 text-gray-300 font-semibold">Business</th>
@@ -568,7 +577,7 @@ function App() {
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                             lead.valueTier === 'Premium' ? 'bg-purple-700 text-purple-100' :
                             lead.valueTier === 'High' ? 'bg-blue-700 text-blue-100' :
                             lead.valueTier === 'Medium' ? 'bg-green-700 text-green-100' :
@@ -579,11 +588,11 @@ function App() {
                         </td>
                         <td className="px-4 py-3">
                           {lead.phone ? (
-                            <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300">
+                            <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 whitespace-nowrap">
                               {lead.phone}
                             </a>
                           ) : (
-                            <span className="text-gray-500">No phone</span>
+                            <span className="text-gray-500 whitespace-nowrap">No phone</span>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -592,12 +601,12 @@ function App() {
                               href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1"
+                              className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1 whitespace-nowrap"
                             >
                               🌐 Website
                             </a>
                           ) : (
-                            <span className="text-gray-500">No website</span>
+                            <span className="text-gray-500 whitespace-nowrap">No website</span>
                           )}
                         </td>
                         <td className="px-4 py-3" style={{color: '#ffffff'}}>{lead.city}</td>
