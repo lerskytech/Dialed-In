@@ -13,6 +13,7 @@ function App() {
   const [filterCategory, setFilterCategory] = useState('');
   const [filterValueTier, setFilterValueTier] = useState('');
   const [filterRating, setFilterRating] = useState('');
+  const [filterCity, setFilterCity] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
   const [city, setCity] = useState('');
@@ -91,6 +92,10 @@ function App() {
       filtered = filtered.filter(lead => lead.rating && lead.rating >= minRating);
     }
     
+    if (filterCity) {
+      filtered = filtered.filter(lead => lead.city === filterCity);
+    }
+    
     // Apply sorting
     filtered.sort((a, b) => {
       let aValue, bValue;
@@ -126,7 +131,13 @@ function App() {
     });
     
     return filtered;
-  }, [leads, filterCategory, filterValueTier, filterRating, sortBy, sortOrder]);
+  }, [leads, filterCategory, filterValueTier, filterRating, filterCity, sortBy, sortOrder]);
+
+  // Get unique cities from leads for filter dropdown
+  const uniqueCities = useMemo(() => {
+    const cities = [...new Set(leads.map(lead => lead.city).filter(Boolean))];
+    return cities.sort();
+  }, [leads]);
 
   // Download functions
   const downloadCSV = () => {
@@ -365,6 +376,18 @@ function App() {
                 ))}
               </select>
 
+              {/* City Filter */}
+              <select
+                value={filterCity}
+                onChange={(e) => setFilterCity(e.target.value)}
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base"
+              >
+                <option value="">All Cities</option>
+                {uniqueCities.map(city => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
+
               {/* Value Tier Filter */}
               <select
                 value={filterValueTier}
@@ -427,6 +450,18 @@ function App() {
                 <option value="">All Categories</option>
                 {categoryOptions.map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+
+              {/* City Filter */}
+              <select
+                value={filterCity}
+                onChange={(e) => setFilterCity(e.target.value)}
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
+              >
+                <option value="">All Cities</option>
+                {uniqueCities.map(city => (
+                  <option key={city} value={city}>{city}</option>
                 ))}
               </select>
 
