@@ -154,14 +154,50 @@ async function fetchGooglePlacesData(query, apiKey, maxLeads = 25) {
   return allPlaces;
 }
 
-// Simple duplicate removal based on Google Place ID
+// Enhanced duplicate removal and corporation filtering
 function removeDuplicates(leads) {
   const seen = new Set();
+  const seenNames = new Set();
+  
   return leads.filter(lead => {
+    // Remove exact duplicates by Google Place ID
     if (seen.has(lead.googlePlaceId)) {
       return false;
     }
+    
+    // Remove near-duplicate business names (normalize and compare)
+    const normalizedName = lead.name.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+      .replace(/\s+/g, ' ') // Normalize spaces
+      .trim();
+    
+    if (seenNames.has(normalizedName)) {
+      return false;
+    }
+    
+    // Filter out corporations and large chains
+    const name = lead.name.toLowerCase();
+    const corporateIndicators = [
+      'corporation', 'corp', 'inc', 'llc', 'ltd', 'limited',
+      'walmart', 'target', 'home depot', 'lowes', 'costco',
+      'mcdonalds', 'burger king', 'subway', 'starbucks',
+      'cvs', 'walgreens', 'rite aid', 'publix', 'kroger',
+      'bank of america', 'wells fargo', 'chase', 'citibank',
+      'at&t', 'verizon', 't-mobile', 'sprint'
+    ];
+    
+    const isCorporation = corporateIndicators.some(indicator => 
+      name.includes(indicator)
+    );
+    
+    if (isCorporation) {
+      console.log(`🚫 Filtered out corporation: ${lead.name}`);
+      return false;
+    }
+    
+    // Add to seen sets
     seen.add(lead.googlePlaceId);
+    seenNames.add(normalizedName);
     return true;
   });
 }
@@ -186,11 +222,13 @@ function addValueRanking(leads) {
       else valueScore += 5;
     }
     
-    // Business name quality indicators (0-20 points)
+    // Business name quality indicators (0-20 points) - favor local businesses
     const name = lead.name.toLowerCase();
-    if (name.includes('inc') || name.includes('corp') || name.includes('llc')) valueScore += 10;
-    if (name.includes('professional') || name.includes('expert') || name.includes('premium')) valueScore += 5;
-    if (name.includes('emergency') || name.includes('24/7') || name.includes('24 hour')) valueScore += 5;
+    if (name.includes('professional') || name.includes('expert') || name.includes('premium')) valueScore += 10;
+    if (name.includes('emergency') || name.includes('24/7') || name.includes('24 hour')) valueScore += 8;
+    if (name.includes('local') || name.includes('family') || name.includes('custom')) valueScore += 5;
+    // Small business indicators
+    if (name.includes('& sons') || name.includes('& daughter') || name.includes('brothers') || name.includes('sisters')) valueScore += 5;
     
     // Address quality (established businesses) (0-10 points)
     if (lead.address && lead.address.includes('Suite') || lead.address.includes('Unit')) valueScore += 5;

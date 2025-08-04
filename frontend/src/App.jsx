@@ -347,8 +347,8 @@ function App() {
         <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 sm:p-6 mb-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
             <h2 className="text-lg sm:text-xl font-bold text-white">Filter and Sort Leads</h2>
-            {/* Mobile: Stack filters vertically */}
-            <div className="flex flex-col gap-3 sm:hidden">
+            {/* Mobile: Stack filters vertically - centered */}
+            <div className="flex flex-col gap-3 sm:hidden items-center w-full">
               {/* Category Filter */}
               <select
                 value={filterCategory}
