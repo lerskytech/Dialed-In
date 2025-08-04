@@ -112,7 +112,14 @@ app.post('/api/search', async (req, res) => {
         const places = await searchPlaces(cityToSearch, categoryToSearch, apiKeyToUse, leadsForThisCombo);
         console.log(`✅ Found ${places.length} real leads for ${categoryToSearch} in ${cityToSearch}`);
         
-        allPlaces = [...allPlaces, ...places];
+        // Assign city and category to each place object
+        const placesWithCityCategory = places.map(place => ({
+          ...place,
+          city: cityToSearch,
+          category: categoryToSearch
+        }));
+        
+        allPlaces = [...allPlaces, ...placesWithCityCategory];
         searchResults.push({
           city: cityToSearch,
           category: categoryToSearch,
