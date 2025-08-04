@@ -109,6 +109,10 @@ function App() {
           aValue = a.city || '';
           bValue = b.city || '';
           break;
+        case 'createdAt':
+          aValue = new Date(a.createdAt || 0).getTime();
+          bValue = new Date(b.createdAt || 0).getTime();
+          break;
         default: // name
           aValue = a.name || '';
           bValue = b.name || '';
@@ -398,6 +402,7 @@ function App() {
                 <option value="rating">Sort by Rating</option>
                 <option value="valueTier">Sort by Value Tier</option>
                 <option value="city">Sort by City</option>
+                <option value="createdAt">Sort by Most Recent</option>
               </select>
 
               {/* Sort Order */}
@@ -462,6 +467,7 @@ function App() {
                 <option value="rating">Rating</option>
                 <option value="valueTier">Value Tier</option>
                 <option value="city">City</option>
+                <option value="createdAt">Most Recent</option>
               </select>
 
               {/* Sort Order */}
