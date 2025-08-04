@@ -1,6 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const { searchPlaces } = require('./placesService');
+const LeadBackupSystem = require('./backup');
 require('dotenv').config();
 
 // Fail-fast environment variable validation
@@ -34,6 +35,9 @@ const db = new sqlite3.Database('./dialed-in-leads.db', (err) => {
   }
   console.log('✅ Connected to persistent SQLite database: dialed-in-leads.db');
 });
+
+// Initialize backup system for data protection
+const backupSystem = new LeadBackupSystem('./dialed-in-leads.db');
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS leads (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -194,6 +198,42 @@ app.delete('/api/leads/clear', (req, res) => {
   }
 });
 
+// Backup leads to prevent data loss
+app.post('/api/backup', async (req, res) => {
+  try {
+    const result = await backupSystem.exportLeads();
+    res.json({ 
+      message: 'Backup created successfully',
+      file: result.file,
+      count: result.count
+    });
+  } catch (error) {
+    console.error('❌ Error creating backup:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Restore leads from backup
+app.post('/api/restore', async (req, res) => {
+  try {
+    const latestBackup = backupSystem.getLatestBackup();
+    if (!latestBackup) {
+      return res.status(404).json({ error: 'No backup files found' });
+    }
+    
+    const result = await backupSystem.importLeads(latestBackup);
+    res.json({ 
+      message: 'Leads restored successfully',
+      imported: result.imported,
+      total: result.total,
+      backupFile: latestBackup
+    });
+  } catch (error) {
+    console.error('❌ Error restoring backup:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
@@ -201,6 +241,10 @@ app.get('/api/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
   console.log('✅ Database initialized');
+  
+  // Start automatic backup system
+  backupSystem.startAutomaticBackup();
+  console.log('🛡️ Automatic backup system activated');
 });
 
 module.exports = app;
