@@ -73,6 +73,57 @@ function App() {
     }
   }, [isAuthenticated]);
 
+  // Filter and sort leads
+  const filteredAndSortedLeads = useMemo(() => {
+    let filtered = [...leads];
+    
+    // Apply filters
+    if (filterCategory) {
+      filtered = filtered.filter(lead => lead.category === filterCategory);
+    }
+    
+    if (filterValueTier) {
+      filtered = filtered.filter(lead => lead.valueTier === filterValueTier);
+    }
+    
+    if (filterRating) {
+      const minRating = parseFloat(filterRating);
+      filtered = filtered.filter(lead => lead.rating && lead.rating >= minRating);
+    }
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortBy) {
+        case 'rating':
+          aValue = a.rating || 0;
+          bValue = b.rating || 0;
+          break;
+        case 'valueTier':
+          const tierOrder = { 'Premium': 4, 'High': 3, 'Medium': 2, 'Standard': 1 };
+          aValue = tierOrder[a.valueTier] || 0;
+          bValue = tierOrder[b.valueTier] || 0;
+          break;
+        case 'city':
+          aValue = a.city || '';
+          bValue = b.city || '';
+          break;
+        default: // name
+          aValue = a.name || '';
+          bValue = b.name || '';
+      }
+      
+      if (typeof aValue === 'string') {
+        return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      } else {
+        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+    });
+    
+    return filtered;
+  }, [leads, filterCategory, filterValueTier, filterRating, sortBy, sortOrder]);
+
   // Download functions
   const downloadCSV = () => {
     if (leads.length === 0) {
