@@ -392,7 +392,7 @@ function App() {
 
         {/* Filtering and Sorting Controls */}
         <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 sm:p-6 mb-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-3 gap-4 sm:gap-2">
             <h2 className="text-lg sm:text-xl font-bold text-white">Filter and Sort Leads</h2>
             {/* Mobile: Stack filters vertically - centered */}
             <div className="flex flex-col gap-3 sm:hidden items-center w-full">
@@ -472,7 +472,7 @@ function App() {
             </div>
 
             {/* Desktop: Horizontal layout */}
-            <div className="hidden sm:flex gap-2 w-full sm:w-auto">
+            <div className="hidden sm:flex gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
               {/* Category Filter */}
               <select
                 value={filterCategory}
@@ -541,7 +541,7 @@ function App() {
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
+                className="w-full sm:w-28 bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm flex-shrink-0"
               >
                 <option value="asc">Ascending</option>
                 <option value="desc">Descending</option>
