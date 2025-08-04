@@ -112,6 +112,56 @@ app.post('/api/search', async (req, res) => {
   }
 });
 
+// Import leads from CSV data (restore functionality)
+app.post('/api/import-leads', (req, res) => {
+  try {
+    const { leads } = req.body;
+    
+    if (!leads || !Array.isArray(leads)) {
+      return res.status(400).json({ error: 'Invalid leads data. Expected array of leads.' });
+    }
+    
+    const stmt = db.prepare(`INSERT OR IGNORE INTO leads (name, rating, reviewCount, address, googlePlaceId, city, category, phone, website, valueScore, valueTier, contributedBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+    
+    let importedCount = 0;
+    for (const lead of leads) {
+      // Generate a unique googlePlaceId if not provided
+      const placeId = lead.googlePlaceId || `imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      const result = stmt.run(
+        lead.name || 'Unknown Business',
+        parseFloat(lead.rating) || null,
+        parseInt(lead.reviewCount) || null,
+        lead.address || '',
+        placeId,
+        lead.city || '',
+        lead.category || 'Unknown',
+        lead.phone || null,
+        lead.website || null,
+        parseInt(lead.valueScore) || 0,
+        lead.valueTier || 'Standard',
+        lead.contributedBy || 'Imported'
+      );
+      
+      if (result.changes > 0) {
+        importedCount++;
+      }
+    }
+    
+    stmt.finalize();
+    
+    console.log(`📥 Imported ${importedCount} leads successfully`);
+    res.json({ 
+      message: `Successfully imported ${importedCount} leads`, 
+      imported: importedCount,
+      total: leads.length 
+    });
+  } catch (error) {
+    console.error('Import error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get all shared leads (collaborative access)
 app.get('/api/leads', (req, res) => {
   // Return all leads for collaborative access between Skyler and Eden
