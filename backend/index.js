@@ -156,7 +156,7 @@ app.post('/api/search', async (req, res) => {
     }
     stmt.finalize();
     
-    console.log(`🎉 Actually added ${newLeadsAdded} new leads (${places.length - newLeadsAdded} were duplicates)`);
+    console.log(`🎉 Actually added ${newLeadsAdded} new leads (${allPlaces.length - newLeadsAdded} were duplicates)`);
     res.json({ 
       data: allPlaces,
       newLeads: newLeadsAdded,
