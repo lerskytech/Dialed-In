@@ -50,8 +50,29 @@ function App() {
     { value: 'Plumbing', label: 'Plumbing Services' },
     { value: 'Electrical', label: 'Electrical Services' },
     { value: 'Roofing', label: 'Roofing & Repair' },
-    { value: 'Restaurant', label: 'Restaurants' },
-    { value: 'Retail', label: 'Retail Stores' }
+    { value: 'Event Planner', label: 'Event Planners' },
+    { value: 'Garage Door Repair', label: 'Garage Door Repair Companies' },
+    { value: 'Pest Control', label: 'Pest Control Services' },
+    { value: 'Pool Cleaning', label: 'Pool Cleaning & Maintenance' },
+    { value: 'Hair Salon', label: 'Hair Salons (Female)' },
+    { value: 'Boutique', label: 'Boutiques' },
+    { value: 'Barber', label: 'Barber Shops' },
+    { value: 'Plastic Surgeon', label: 'Plastic Surgeons' },
+    { value: 'Massage Therapist', label: 'Massage Therapists' },
+    { value: 'Real Estate Agent', label: 'Real Estate Agents' },
+    { value: 'Chiropractor', label: 'Chiropractors' },
+    { value: 'Dermatologist', label: 'Dermatologists' },
+    { value: 'Financial Advisor', label: 'Financial Advisors' },
+    { value: 'Private Tutor', label: 'Private Tutors' },
+    { value: 'Auto Repair', label: 'Auto Repair & Detailing' },
+    { value: 'Family Law Attorney', label: 'Family Law & Immigration Attorneys' },
+    { value: 'Personal Injury Attorney', label: 'Personal Injury Attorneys' },
+    { value: 'Personal Trainer', label: 'Personal Trainers' },
+    { value: 'Landscaping', label: 'Landscaping Services' },
+    { value: 'Spa', label: 'Spas' },
+    { value: 'Psychic', label: 'Psychics' },
+    { value: 'Lounge', label: 'Lounges (Kava, Hookah, Tea, Coffee)' },
+    { value: 'Catering', label: 'Catering & Food Trucks' }
   ];
 
   // Load leads function
