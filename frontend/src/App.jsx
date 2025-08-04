@@ -523,7 +523,13 @@ function App() {
               {/* Sort By */}
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  // Automatically set to descending for Most Recent
+                  if (e.target.value === 'createdAt') {
+                    setSortOrder('desc');
+                  }
+                }}
                 className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base"
               >
                 <option value="name">Sort by Name</option>
@@ -600,7 +606,13 @@ function App() {
               {/* Sort By */}
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  // Automatically set to descending for Most Recent
+                  if (e.target.value === 'createdAt') {
+                    setSortOrder('desc');
+                  }
+                }}
                 className="w-full sm:w-32 bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm flex-shrink-0"
               >
                 <option value="name">Name</option>
