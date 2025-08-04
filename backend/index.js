@@ -61,10 +61,28 @@ app.post('/api/search', async (req, res) => {
       return res.status(400).json({ error: 'City and category are required.' });
     }
     
-    // Use user's API key if provided, otherwise fall back to system key
-    const apiKeyToUse = userApiKey || process.env.GOOGLE_PLACES_API_KEY;
+    // Get contributor name from token to determine API key requirements
+    const authHeader = req.headers.authorization;
+    const userToken = authHeader ? authHeader.replace('Bearer ', '') : 'anonymous';
+    const contributorName = userToken === 'dialed-in-partner-access-2024' ? 'Skyler' : 
+                           userToken === 'dialed-in-business-partner-2024' ? 'Eden' : 'Unknown';
+    
+    // Determine which API key to use based on user
+    let apiKeyToUse;
+    if (contributorName === 'Skyler') {
+      // Skyler can use either his personal API key or the system fallback
+      apiKeyToUse = userApiKey || process.env.GOOGLE_PLACES_API_KEY;
+    } else {
+      // All other users (including Eden) MUST provide their own API key
+      apiKeyToUse = userApiKey;
+    }
+    
     if (!apiKeyToUse) {
-      return res.status(400).json({ error: 'No API key available. Please configure your Google Places API key in settings.' });
+      if (contributorName === 'Skyler') {
+        return res.status(400).json({ error: 'No API key available. Please configure your Google Places API key in settings.' });
+      } else {
+        return res.status(400).json({ error: `${contributorName} must configure their own Google Places API key in settings to generate leads. Contact Skyler for API key setup instructions.` });
+      }
     }
     
     console.log(`🔍 Searching for ${category} in ${city} (max ${maxLeads} leads)...`);
@@ -74,11 +92,7 @@ app.post('/api/search', async (req, res) => {
     // Store in database with contributor tracking
     const stmt = db.prepare(`INSERT OR IGNORE INTO leads (name, rating, reviewCount, address, googlePlaceId, city, category, phone, website, valueScore, valueTier, contributedBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
     
-    // Get contributor name from token
-    const authHeader = req.headers.authorization;
-    const userToken = authHeader ? authHeader.replace('Bearer ', '') : 'anonymous';
-    const contributorName = userToken === 'dialed-in-partner-access-2024' ? 'Skyler' : 
-                           userToken === 'dialed-in-business-partner-2024' ? 'Eden' : 'Unknown';
+    // Contributor name already determined above
     
     // Track actual new leads added (not duplicates)
     let newLeadsAdded = 0;
