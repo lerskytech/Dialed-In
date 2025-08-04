@@ -472,12 +472,12 @@ function App() {
             </div>
 
             {/* Desktop: Horizontal layout */}
-            <div className="hidden sm:flex gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <div className="hidden sm:flex gap-2 flex-wrap w-full">
               {/* Category Filter */}
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
+                className="w-full sm:w-36 bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm flex-shrink-0"
               >
                 <option value="">All Categories</option>
                 {categoryOptions.map(option => (
@@ -489,7 +489,7 @@ function App() {
               <select
                 value={filterCity}
                 onChange={(e) => setFilterCity(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
+                className="w-full sm:w-32 bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm flex-shrink-0"
               >
                 <option value="">All Cities</option>
                 {uniqueCities.map(city => (
@@ -501,7 +501,7 @@ function App() {
               <select
                 value={filterValueTier}
                 onChange={(e) => setFilterValueTier(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
+                className="w-full sm:w-36 bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm flex-shrink-0"
               >
                 <option value="">All Value Tiers</option>
                 <option value="Premium">Premium</option>
@@ -514,7 +514,7 @@ function App() {
               <select
                 value={filterRating}
                 onChange={(e) => setFilterRating(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
+                className="w-full sm:w-32 bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm flex-shrink-0"
               >
                 <option value="">All Ratings</option>
                 <option value="5">5+</option>
@@ -528,7 +528,7 @@ function App() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
+                className="w-full sm:w-32 bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm flex-shrink-0"
               >
                 <option value="name">Name</option>
                 <option value="rating">Rating</option>
