@@ -552,8 +552,8 @@ function App() {
                     </div>
                     
                     {/* Contact Info */}
-                    <div className="flex gap-4">
-                      <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <div>
                         {lead.phone ? (
                           <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm block touch-manipulation">
                             📞 {lead.phone}
@@ -562,7 +562,7 @@ function App() {
                           <span className="text-gray-500 text-sm">📞 No phone</span>
                         )}
                       </div>
-                      <div className="flex-1">
+                      <div>
                         {lead.website ? (
                           <a 
                             href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
