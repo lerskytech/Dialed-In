@@ -49,7 +49,7 @@ function App() {
   const loadLeads = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/leads', {
+      const response = await fetch('https://dialed-in.onrender.com/api/leads', {
         headers: getAuthHeaders()
       });
       if (response.ok) {
@@ -180,7 +180,7 @@ function App() {
       // Load API key from localStorage based on user token
       const apiKey = localStorage.getItem(`dialed-in-api-key-${token}`);
       
-      const response = await fetch('/api/search', {
+      const response = await fetch('https://dialed-in.onrender.com/api/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
