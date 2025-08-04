@@ -1,0 +1,34 @@
+{
+  "leads": [
+    {
+      "name": "Dallas Immigration Attorney Professional 1001",
+      "rating": 3.1,
+      "reviewCount": 441,
+      "address": "2000 Business Blvd, Dallas, TX, USA",
+      "googlePlaceId": "ChIJImmigrationAttorneyProfessional1000",
+      "city": "Dallas, TX",
+      "category": "Immigration Attorney",
+      "phone": "(183) 505-8149",
+      "website": "https://immigrationattorney1000.com",
+      "valueScore": 62,
+      "valueTier": "Standard",
+      "contributedBy": "Skyler",
+      "businessStatus": "OPERATIONAL"
+    },
+    {
+      "name": "Asheville Personal Injury Attorney Expert 1002",
+      "rating": 4.6,
+      "reviewCount": 64,
+      "address": "2001 Business Blvd, Asheville, NC, USA",
+      "googlePlaceId": "ChIJPersonalInjuryAttorneyExpert1001",
+      "city": "Asheville, NC",
+      "category": "Personal Injury Attorney",
+      "phone": "(514) 673-6816",
+      "website": "https://personalinjuryattorney1001.com",
+      "valueScore": 64,
+      "valueTier": "Standard",
+      "contributedBy": "Skyler",
+      "businessStatus": "OPERATIONAL"
+    }
+  ]
+}

@@ -176,6 +176,24 @@ app.get('/api/leads', (req, res) => {
 });
 
 // Health check
+// Clear all leads from database (for fake data removal)
+app.delete('/api/leads/clear', (req, res) => {
+  try {
+    const stmt = db.prepare('DELETE FROM leads');
+    const result = stmt.run();
+    stmt.finalize();
+    
+    console.log(`🗑️ Cleared ${result.changes} leads from database`);
+    res.json({ 
+      message: `Successfully cleared ${result.changes} leads from database`,
+      cleared: result.changes 
+    });
+  } catch (error) {
+    console.error('❌ Error clearing leads:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
