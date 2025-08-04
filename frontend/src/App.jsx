@@ -31,9 +31,17 @@ function App() {
     { value: 'Miami, FL', label: 'Miami, FL' },
     { value: 'Orlando, FL', label: 'Orlando, FL' },
     { value: 'Tampa, FL', label: 'Tampa, FL' },
+    { value: 'Jacksonville, FL', label: 'Jacksonville, FL' },
     { value: 'Atlanta, GA', label: 'Atlanta, GA' },
     { value: 'Houston, TX', label: 'Houston, TX' },
-    { value: 'Dallas, TX', label: 'Dallas, TX' }
+    { value: 'Dallas, TX', label: 'Dallas, TX' },
+    { value: 'Asheville, NC', label: 'Asheville, NC' },
+    { value: 'Nashville, TN', label: 'Nashville, TN' },
+    { value: 'Charleston, SC', label: 'Charleston, SC' },
+    { value: 'Virginia Beach, VA', label: 'Virginia Beach, VA' },
+    { value: 'Charlotte, NC', label: 'Charlotte, NC' },
+    { value: 'Raleigh, NC', label: 'Raleigh, NC' },
+    { value: 'Greenville, SC', label: 'Greenville, SC' }
   ];
 
   // Category options
@@ -290,7 +298,8 @@ function App() {
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm max-h-48 overflow-y-auto"
+                size="1"
               >
                 <option value="">Select a city...</option>
                 {cityOptions.map(option => (
@@ -305,7 +314,8 @@ function App() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm max-h-48 overflow-y-auto"
+                size="1"
               >
                 <option value="">Select a category...</option>
                 {categoryOptions.map(option => (
