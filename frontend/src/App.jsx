@@ -54,7 +54,7 @@ function App() {
     { value: 'Garage Door Repair', label: 'Garage Door Repair Companies' },
     { value: 'Pest Control', label: 'Pest Control Services' },
     { value: 'Pool Cleaning', label: 'Pool Cleaning & Maintenance' },
-    { value: 'Hair Salon', label: 'Hair Salons (Female)' },
+    { value: 'Hair Salon', label: 'Hair Salons' },
     { value: 'Boutique', label: 'Boutiques' },
     { value: 'Barber', label: 'Barber Shops' },
     { value: 'Plastic Surgeon', label: 'Plastic Surgeons' },
@@ -64,15 +64,16 @@ function App() {
     { value: 'Dermatologist', label: 'Dermatologists' },
     { value: 'Financial Advisor', label: 'Financial Advisors' },
     { value: 'Private Tutor', label: 'Private Tutors' },
-    { value: 'Auto Repair', label: 'Auto Repair & Detailing' },
-    { value: 'Family Law Attorney', label: 'Family Law & Immigration Attorneys' },
+    { value: 'Auto Repair', label: 'Auto Repair' },
+    { value: 'Family Law Attorney', label: 'Family Law Attorneys' },
+    { value: 'Immigration Attorney', label: 'Immigration Attorneys' },
     { value: 'Personal Injury Attorney', label: 'Personal Injury Attorneys' },
     { value: 'Personal Trainer', label: 'Personal Trainers' },
     { value: 'Landscaping', label: 'Landscaping Services' },
     { value: 'Spa', label: 'Spas' },
     { value: 'Psychic', label: 'Psychics' },
-    { value: 'Lounge', label: 'Lounges (Kava, Hookah, Tea, Coffee)' },
-    { value: 'Catering', label: 'Catering & Food Trucks' }
+    { value: 'Lounge', label: 'Lounges' },
+    { value: 'Catering', label: 'Catering Services' }
   ];
 
   // Load leads function
