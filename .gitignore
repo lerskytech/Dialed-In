@@ -16,8 +16,8 @@ yarn-error.log*
 .pnp.js
 
 # Database files (contains sensitive lead data)
-*.db
-*.sqlite
+# *.db
+# *.sqlite
 *.sqlite3
 
 # Testing

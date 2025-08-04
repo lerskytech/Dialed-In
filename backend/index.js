@@ -81,7 +81,7 @@ app.post('/api/search', async (req, res) => {
       if (contributorName === 'Skyler') {
         return res.status(400).json({ error: 'No API key available. Please configure your Google Places API key in settings.' });
       } else {
-        return res.status(400).json({ error: `${contributorName} must configure their own Google Places API key in settings to generate leads. Contact Skyler for API key setup instructions.` });
+        return res.status(400).json({ error: 'Upgrade API Key in settings to unlock this feature' });
       }
     }
     
