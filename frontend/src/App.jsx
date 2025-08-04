@@ -7,6 +7,14 @@ function App() {
   const { isAuthenticated, loading: authLoading, getAuthHeaders, logout, userName, token } = useAuth();
 
   // All hooks must be declared before any conditional returns
+  const [userApiKey, setUserApiKey] = useState('');
+  
+  // Filtering and sorting state
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterValueTier, setFilterValueTier] = useState('');
+  const [filterRating, setFilterRating] = useState('');
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
   const [city, setCity] = useState('');
   const [category, setCategory] = useState('');
   const [maxLeads, setMaxLeads] = useState(25);
@@ -284,16 +292,84 @@ function App() {
           )}
         </div>
 
-        {/* Leads Display */}
+        {/* Filtering and Sorting Controls */}
+        <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 sm:p-6 mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+            <h2 className="text-lg sm:text-xl font-bold text-white">Filter and Sort Leads</h2>
+            <div className="flex gap-2 w-full sm:w-auto">
+              {/* Category Filter */}
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+              >
+                <option value="">All Categories</option>
+                {categoryOptions.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+
+              {/* Value Tier Filter */}
+              <select
+                value={filterValueTier}
+                onChange={(e) => setFilterValueTier(e.target.value)}
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+              >
+                <option value="">All Value Tiers</option>
+                <option value="Premium">Premium</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Standard">Standard</option>
+              </select>
+
+              {/* Rating Filter */}
+              <select
+                value={filterRating}
+                onChange={(e) => setFilterRating(e.target.value)}
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+              >
+                <option value="">All Ratings</option>
+                <option value="5">5+</option>
+                <option value="4">4+</option>
+                <option value="3">3+</option>
+                <option value="2">2+</option>
+                <option value="1">1+</option>
+              </select>
+
+              {/* Sort By */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+              >
+                <option value="name">Name</option>
+                <option value="rating">Rating</option>
+                <option value="valueTier">Value Tier</option>
+                <option value="city">City</option>
+              </select>
+
+              {/* Sort Order */}
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Generated Leads Section */}
         <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 sm:gap-0">
-            <h2 className="text-xl font-bold text-white">
-              Generated Leads ({leads.length})
-            </h2>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-white">Generated Leads ({filteredAndSortedLeads.length})</h2>
             {leads.length > 0 && (
               <div className="flex gap-2 w-full sm:w-auto">
                 <button
                   onClick={downloadCSV}
+
                   className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 touch-manipulation"
                 >
                   📊 <span className="hidden sm:inline">Download </span>CSV
@@ -316,11 +392,15 @@ function App() {
             <div className="text-center py-8">
               <div className="text-gray-400">No leads found. Start by searching for leads above.</div>
             </div>
+          ) : filteredAndSortedLeads.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-gray-400">No leads match your current filters. Try adjusting the filters above.</div>
+            </div>
           ) : (
             <>
               {/* Mobile Card Layout */}
               <div className="block lg:hidden space-y-4">
-                {leads.map((lead, index) => (
+                {filteredAndSortedLeads.map((lead, index) => (
                   <div key={lead.id || index} className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 space-y-3">
                     {/* Business Name & Address */}
                     <div>
@@ -411,7 +491,7 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {leads.map((lead, index) => (
+                    {filteredAndSortedLeads.map((lead, index) => (
                       <tr key={lead.id || index} className="border-b border-slate-700 hover:bg-slate-700/50">
                         <td className="px-4 py-3">
                           <div className="font-medium">
