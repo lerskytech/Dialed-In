@@ -256,7 +256,7 @@ function App() {
                 onClick={logout}
                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded text-sm transition-colors touch-manipulation"
               >
-                <span className="sm:hidden">👋</span><span className="hidden sm:inline">Logout</span>
+                <span className="sm:hidden">🚪</span><span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           </div>
@@ -347,12 +347,13 @@ function App() {
         <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 sm:p-6 mb-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
             <h2 className="text-lg sm:text-xl font-bold text-white">Filter and Sort Leads</h2>
-            <div className="flex gap-2 w-full sm:w-auto">
+            {/* Mobile: Stack filters vertically */}
+            <div className="flex flex-col gap-3 sm:hidden">
               {/* Category Filter */}
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base"
               >
                 <option value="">All Categories</option>
                 {categoryOptions.map(option => (
@@ -364,7 +365,7 @@ function App() {
               <select
                 value={filterValueTier}
                 onChange={(e) => setFilterValueTier(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base"
               >
                 <option value="">All Value Tiers</option>
                 <option value="Premium">Premium</option>
@@ -377,7 +378,71 @@ function App() {
               <select
                 value={filterRating}
                 onChange={(e) => setFilterRating(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base"
+              >
+                <option value="">All Ratings</option>
+                <option value="5">5+ Stars</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="2">2+ Stars</option>
+                <option value="1">1+ Stars</option>
+              </select>
+
+              {/* Sort By */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base"
+              >
+                <option value="name">Sort by Name</option>
+                <option value="rating">Sort by Rating</option>
+                <option value="valueTier">Sort by Value Tier</option>
+                <option value="city">Sort by City</option>
+              </select>
+
+              {/* Sort Order */}
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base"
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+
+            {/* Desktop: Horizontal layout */}
+            <div className="hidden sm:flex gap-2 w-full sm:w-auto">
+              {/* Category Filter */}
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
+              >
+                <option value="">All Categories</option>
+                {categoryOptions.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+
+              {/* Value Tier Filter */}
+              <select
+                value={filterValueTier}
+                onChange={(e) => setFilterValueTier(e.target.value)}
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
+              >
+                <option value="">All Value Tiers</option>
+                <option value="Premium">Premium</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Standard">Standard</option>
+              </select>
+
+              {/* Rating Filter */}
+              <select
+                value={filterRating}
+                onChange={(e) => setFilterRating(e.target.value)}
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
               >
                 <option value="">All Ratings</option>
                 <option value="5">5+</option>
@@ -391,7 +456,7 @@ function App() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
               >
                 <option value="name">Name</option>
                 <option value="rating">Rating</option>
@@ -403,7 +468,7 @@ function App() {
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 sm:py-2 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base sm:text-sm"
+                className="w-full sm:w-auto bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm"
               >
                 <option value="asc">Ascending</option>
                 <option value="desc">Descending</option>
