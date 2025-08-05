@@ -866,44 +866,44 @@ function App() {
                     </div>
                     
                     {/* Contact Info */}
-                    <div className="space-y-3 mb-3">
-                      <div className="grid grid-cols-1 gap-2">
-                        <div className="space-y-1">
-                          <div className="text-sm font-medium text-gray-300">Contact Info</div>
-                          {lead.phone ? (
-                            <div>
-                              <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm touch-manipulation">
-                                📞 {lead.phone}
-                              </a>
-                            </div>
-                          ) : (
-                            <div className="text-gray-500 text-sm">📞 No phone</div>
-                          )}
-                          {lead.email ? (
-                            <div>
-                              <a href={`mailto:${lead.email}`} className="text-green-400 hover:text-green-300 text-sm touch-manipulation truncate block">
-                                📧 {lead.email}
-                              </a>
-                            </div>
-                          ) : (
-                            <div className="text-gray-500 text-sm">📧 No email</div>
-                          )}
+                    <div className="space-y-4 mb-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <div className="text-xs font-medium text-gray-400 uppercase tracking-wide">Contact</div>
+                          <div className="space-y-1">
+                            {lead.phone ? (
+                              <div>
+                                <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm touch-manipulation block">
+                                  📞 {lead.phone}
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="text-gray-500 text-sm">📞 No phone</div>
+                            )}
+                            {lead.email ? (
+                              <div>
+                                <a href={`mailto:${lead.email}`} className="text-green-400 hover:text-green-300 text-sm touch-manipulation truncate block">
+                                  📧 {lead.email}
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="text-gray-500 text-sm">📧 No email</div>
+                            )}
+                          </div>
                         </div>
                         <div className="space-y-2">
-                          <div className="text-sm font-medium text-gray-300">Website</div>
+                          <div className="text-xs font-medium text-gray-400 uppercase tracking-wide">Website</div>
                           {lead.website ? (
                             <div className="space-y-2">
-                              <div>
+                              <div className="flex items-center justify-between">
                                 <a 
                                   href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1 text-sm"
                                 >
-                                  🌐 Website
+                                  🌐 Site
                                 </a>
-                              </div>
-                              <div className="flex items-center gap-2">
                                 <button
                                   onClick={() => showPerformanceReport(lead.id)}
                                   className={`px-2 py-1 rounded text-xs font-bold cursor-pointer hover:scale-105 transition-transform touch-manipulation ${
@@ -915,7 +915,9 @@ function App() {
                                 >
                                   {lead.performanceScore || 0}
                                 </button>
-                                {(lead.performanceScore || 0) === 0 && (
+                              </div>
+                              {(lead.performanceScore || 0) === 0 && (
+                                <div className="flex justify-end">
                                   <button
                                     onClick={() => analyzeLeadPerformance(lead.id)}
                                     disabled={performanceLoading}
@@ -924,8 +926,8 @@ function App() {
                                   >
                                     {performanceLoading ? '⏳' : '🔍'}
                                   </button>
-                                )}
-                              </div>
+                                </div>
+                              )}
                             </div>
                           ) : (
                             <span className="text-gray-500 text-sm">No website</span>
