@@ -35,6 +35,8 @@ function App() {
     { value: 'Tampa, FL', label: 'Tampa, FL' },
     { value: 'Jacksonville, FL', label: 'Jacksonville, FL' },
     { value: 'Palm Beach County, FL', label: 'Palm Beach County, FL' },
+    { value: 'Broward County, FL', label: 'Broward County, FL' },
+    { value: 'Treasure Coast, FL', label: 'Treasure Coast, FL' },
     { value: 'Atlanta, GA', label: 'Atlanta, GA' },
     { value: 'Houston, TX', label: 'Houston, TX' },
     { value: 'Dallas, TX', label: 'Dallas, TX' },
@@ -811,11 +813,14 @@ function App() {
                           className={`px-3 py-1 rounded text-sm font-medium border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 touch-manipulation ${
                             (lead.status || 'uncalled') === 'called' 
                               ? 'bg-green-700 text-green-100' 
+                              : (lead.status || 'uncalled') === 'unanswered'
+                              ? 'bg-yellow-600 text-yellow-100'
                               : 'bg-orange-700 text-orange-100'
                           }`}
                         >
                           <option value="uncalled">Uncalled</option>
                           <option value="called">Called</option>
+                          <option value="unanswered">Unanswered</option>
                         </select>
                       </div>
                       <div>
@@ -924,11 +929,14 @@ function App() {
                             className={`px-2 py-1 rounded text-xs font-medium border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                               (lead.status || 'uncalled') === 'called' 
                                 ? 'bg-green-700 text-green-100' 
+                                : (lead.status || 'uncalled') === 'unanswered'
+                                ? 'bg-yellow-600 text-yellow-100'
                                 : 'bg-orange-700 text-orange-100'
                             }`}
                           >
                             <option value="uncalled">Uncalled</option>
                             <option value="called">Called</option>
+                            <option value="unanswered">Unanswered</option>
                           </select>
                         </td>
                         <td className="px-4 py-3">

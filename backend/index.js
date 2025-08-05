@@ -265,8 +265,8 @@ app.put('/api/leads/:id/status', (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     
-    if (!status || !['called', 'uncalled'].includes(status)) {
-      return res.status(400).json({ error: 'Status must be either "called" or "uncalled"' });
+    if (!status || !['called', 'uncalled', 'unanswered'].includes(status)) {
+      return res.status(400).json({ error: 'Status must be either "called", "uncalled", or "unanswered"' });
     }
     
     const stmt = db.prepare('UPDATE leads SET status = ? WHERE id = ?');
