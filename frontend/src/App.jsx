@@ -43,7 +43,17 @@ function App() {
     { value: 'Virginia Beach, VA', label: 'Virginia Beach, VA' },
     { value: 'Charlotte, NC', label: 'Charlotte, NC' },
     { value: 'Raleigh, NC', label: 'Raleigh, NC' },
-    { value: 'Greenville, SC', label: 'Greenville, SC' }
+    { value: 'Greenville, SC', label: 'Greenville, SC' },
+    { value: 'Honolulu, HI', label: 'Honolulu, HI' },
+    { value: 'Seattle, WA', label: 'Seattle, WA' },
+    { value: 'Portland, OR', label: 'Portland, OR' },
+    { value: 'Los Angeles, CA', label: 'Los Angeles, CA' },
+    { value: 'San Francisco, CA', label: 'San Francisco, CA' },
+    { value: 'Salt Lake City, UT', label: 'Salt Lake City, UT' },
+    { value: 'Denver, CO', label: 'Denver, CO' },
+    { value: 'Boulder, CO', label: 'Boulder, CO' },
+    { value: 'Colorado Springs, CO', label: 'Colorado Springs, CO' },
+    { value: 'Traverse City, MI', label: 'Traverse City, MI' }
   ];
 
   // Category options
