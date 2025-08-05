@@ -271,14 +271,16 @@ async function enrichLeadsWithPhoneNumbers(leads, apiKey) {
         enrichedLeads.push({
           ...lead,
           phone: details.phone || null,
-          website: details.website || null
+          website: details.website || null,
+          email: details.email || null
         });
       } catch (error) {
         // Keep the lead even if enrichment fails or times out
         enrichedLeads.push({
           ...lead,
           phone: null,
-          website: null
+          website: null,
+          email: null
         });
       }
     }
@@ -300,7 +302,7 @@ async function fetchPlaceDetails(placeId, apiKey) {
     method: 'GET',
     headers: {
       'X-Goog-Api-Key': apiKey,
-      'X-Goog-FieldMask': 'nationalPhoneNumber,websiteUri'
+      'X-Goog-FieldMask': 'nationalPhoneNumber,websiteUri,editorialSummary,businessStatus'
     }
   });
   
@@ -311,9 +313,20 @@ async function fetchPlaceDetails(placeId, apiKey) {
     return {};
   }
   
+  // Extract email from editorial summary if available
+  let email = null;
+  if (data.editorialSummary && data.editorialSummary.text) {
+    const emailMatch = data.editorialSummary.text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    if (emailMatch) {
+      email = emailMatch[0];
+    }
+  }
+  
   return {
     phone: data.nationalPhoneNumber || null,
-    website: data.websiteUri || null
+    website: data.websiteUri || null,
+    email: email,
+    businessStatus: data.businessStatus || null
   };
 }
 

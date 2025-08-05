@@ -902,14 +902,13 @@ function App() {
                               <button
                                 onClick={() => showPerformanceReport(lead.id)}
                                 className={`px-2 py-1 rounded text-xs font-bold cursor-pointer hover:scale-105 transition-transform touch-manipulation ${
-                                  (lead.performanceScore || 0) >= 80 ? 'bg-green-600 text-white' :
-                                  (lead.performanceScore || 0) >= 60 ? 'bg-yellow-600 text-white' :
-                                  (lead.performanceScore || 0) >= 40 ? 'bg-orange-600 text-white' :
+                                  (lead.performanceScore || 0) >= 70 ? 'bg-green-600 text-white' :
+                                  (lead.performanceScore || 0) >= 40 ? 'bg-yellow-600 text-white' :
                                   (lead.performanceScore || 0) > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'
                                 }`}
                                 title="Website performance score - click for sales insights"
                               >
-                                {lead.performanceScore || 0}/100
+                                {lead.performanceScore || 0}
                               </button>
                               {(lead.performanceScore || 0) === 0 && (
                                 <button
@@ -1061,14 +1060,13 @@ function App() {
                                 <button
                                   onClick={() => showPerformanceReport(lead.id)}
                                   className={`px-2 py-1 rounded text-xs font-bold cursor-pointer hover:scale-105 transition-transform ${
-                                    (lead.performanceScore || 0) >= 80 ? 'bg-green-600 text-white' :
-                                    (lead.performanceScore || 0) >= 60 ? 'bg-yellow-600 text-white' :
-                                    (lead.performanceScore || 0) >= 40 ? 'bg-orange-600 text-white' :
+                                    (lead.performanceScore || 0) >= 70 ? 'bg-green-600 text-white' :
+                                    (lead.performanceScore || 0) >= 40 ? 'bg-yellow-600 text-white' :
                                     (lead.performanceScore || 0) > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'
                                   }`}
                                   title="Website performance score - click for sales insights"
                                 >
-                                  {lead.performanceScore || 0}/100
+                                  {lead.performanceScore || 0}
                                 </button>
                                 {(lead.performanceScore || 0) === 0 && (
                                   <button
@@ -1146,12 +1144,11 @@ function App() {
               <div className="bg-slate-700 rounded-lg p-6 mb-6">
                 <div className="flex items-center gap-4 mb-4">
                   <div className={`text-3xl font-bold px-4 py-2 rounded-full ${
-                    selectedLeadPerformance.performanceScore >= 80 ? 'bg-green-600 text-white' :
-                    selectedLeadPerformance.performanceScore >= 60 ? 'bg-yellow-600 text-white' :
-                    selectedLeadPerformance.performanceScore >= 40 ? 'bg-orange-600 text-white' :
+                    selectedLeadPerformance.performanceScore >= 70 ? 'bg-green-600 text-white' :
+                    selectedLeadPerformance.performanceScore >= 40 ? 'bg-yellow-600 text-white' :
                     selectedLeadPerformance.performanceScore > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'
                   }`}>
-                    {selectedLeadPerformance.performanceScore}/100
+                    {selectedLeadPerformance.performanceScore}
                   </div>
                   <div>
                     <h4 className="text-lg font-semibold text-white">Website Performance Score</h4>
@@ -1159,8 +1156,8 @@ function App() {
                       selectedLeadPerformance.performanceScore >= 70 ? 'text-green-400' :
                       selectedLeadPerformance.performanceScore >= 40 ? 'text-yellow-400' : 'text-red-400'
                     }`}>
-                      {selectedLeadPerformance.performanceScore >= 70 ? '✅ Strong online presence' :
-                       selectedLeadPerformance.performanceScore >= 40 ? '⚠️ Room for improvement' : '🚨 Significant opportunity'}
+                      {selectedLeadPerformance.performanceScore >= 70 ? '✅ Good Performance' :
+                       selectedLeadPerformance.performanceScore >= 40 ? '⚠️ Average Performance' : '🚨 Poor Performance'}
                     </p>
                   </div>
                 </div>

@@ -435,14 +435,14 @@ app.post('/api/search', async (req, res) => {
     }
     
     // Store in database with contributor tracking
-    const stmt = db.prepare(`INSERT OR IGNORE INTO leads (name, rating, reviewCount, address, googlePlaceId, city, category, phone, website, valueScore, valueTier, contributedBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+    const stmt = db.prepare(`INSERT OR IGNORE INTO leads (name, rating, reviewCount, address, googlePlaceId, city, category, phone, email, website, valueScore, valueTier, contributedBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
     
     // Contributor name already determined above
     
     // Track actual new leads added (not duplicates)
     let newLeadsAdded = 0;
     for (const place of allPlaces) {
-      const result = stmt.run(place.name, place.rating, place.reviewCount, place.address, place.googlePlaceId, place.city, place.category, place.phone || null, place.website || null, place.valueScore, place.valueTier, contributorName);
+      const result = stmt.run(place.name, place.rating, place.reviewCount, place.address, place.googlePlaceId, place.city, place.category, place.phone || null, place.email || null, place.website || null, place.valueScore, place.valueTier, contributorName);
       if (result.changes > 0) {
         newLeadsAdded++;
       }
@@ -477,7 +477,7 @@ app.post('/api/import-leads', (req, res) => {
       return res.status(400).json({ error: 'Invalid leads data. Expected array of leads.' });
     }
     
-    const stmt = db.prepare(`INSERT OR IGNORE INTO leads (name, rating, reviewCount, address, googlePlaceId, city, category, phone, website, valueScore, valueTier, contributedBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+    const stmt = db.prepare(`INSERT OR IGNORE INTO leads (name, rating, reviewCount, address, googlePlaceId, city, category, phone, email, website, valueScore, valueTier, contributedBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
     
     let importedCount = 0;
     for (const lead of leads) {
@@ -493,6 +493,7 @@ app.post('/api/import-leads', (req, res) => {
         lead.city || '',
         lead.category || 'Unknown',
         lead.phone || null,
+        lead.email || null,
         lead.website || null,
         parseInt(lead.valueScore) || 0,
         lead.valueTier || 'Standard',
