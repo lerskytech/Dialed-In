@@ -34,6 +34,7 @@ function App() {
     { value: 'Orlando, FL', label: 'Orlando, FL' },
     { value: 'Tampa, FL', label: 'Tampa, FL' },
     { value: 'Jacksonville, FL', label: 'Jacksonville, FL' },
+    { value: 'Palm Beach County, FL', label: 'Palm Beach County, FL' },
     { value: 'Atlanta, GA', label: 'Atlanta, GA' },
     { value: 'Houston, TX', label: 'Houston, TX' },
     { value: 'Dallas, TX', label: 'Dallas, TX' },
@@ -106,6 +107,60 @@ function App() {
       console.error('Error loading leads:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Update lead status
+  const updateLeadStatus = async (leadId, status) => {
+    try {
+      const response = await fetch(`https://dialed-in.onrender.com/api/leads/${leadId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({ status })
+      });
+      
+      if (response.ok) {
+        // Update local state
+        setLeads(prevLeads => 
+          prevLeads.map(lead => 
+            lead.id === leadId ? { ...lead, status } : lead
+          )
+        );
+      } else {
+        console.error('Failed to update lead status:', response.status);
+      }
+    } catch (error) {
+      console.error('Error updating lead status:', error);
+    }
+  };
+
+  // Update lead notes
+  const updateLeadNotes = async (leadId, notes) => {
+    try {
+      const response = await fetch(`https://dialed-in.onrender.com/api/leads/${leadId}/notes`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({ notes })
+      });
+      
+      if (response.ok) {
+        // Update local state
+        setLeads(prevLeads => 
+          prevLeads.map(lead => 
+            lead.id === leadId ? { ...lead, notes } : lead
+          )
+        );
+      } else {
+        console.error('Failed to update lead notes:', response.status);
+      }
+    } catch (error) {
+      console.error('Error updating lead notes:', error);
     }
   };
 
@@ -746,15 +801,33 @@ function App() {
                       </div>
                     </div>
                     
-                    {/* Found By */}
-                    <div className="flex justify-end">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        lead.contributedBy === 'Skyler' ? 'bg-blue-700 text-blue-100' :
-                        lead.contributedBy === 'Eden' ? 'bg-green-700 text-green-100' :
-                        'bg-gray-700 text-gray-100'
-                      }`}>
-                        Found by {lead.contributedBy || 'Unknown'}
-                      </span>
+                    {/* Status & Notes */}
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-300">Status:</span>
+                        <select
+                          value={lead.status || 'uncalled'}
+                          onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
+                          className={`px-3 py-1 rounded text-sm font-medium border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 touch-manipulation ${
+                            (lead.status || 'uncalled') === 'called' 
+                              ? 'bg-green-700 text-green-100' 
+                              : 'bg-orange-700 text-orange-100'
+                          }`}
+                        >
+                          <option value="uncalled">Uncalled</option>
+                          <option value="called">Called</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-300 mb-1">Notes:</label>
+                        <input
+                          type="text"
+                          value={lead.notes || ''}
+                          onChange={(e) => updateLeadNotes(lead.id, e.target.value)}
+                          placeholder="Add notes..."
+                          className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-white text-sm focus:border-blue-400 focus:outline-none touch-manipulation"
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -780,7 +853,8 @@ function App() {
                       <th className="px-4 py-3 text-gray-300 font-semibold">Phone</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">Website</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">City</th>
-                      <th className="px-4 py-3 text-gray-300 font-semibold">Found by</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Status</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Notes</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -844,13 +918,27 @@ function App() {
                         </td>
                         <td className="px-4 py-3" style={{color: '#ffffff'}}>{lead.city}</td>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.contributedBy === 'Skyler' ? 'bg-blue-700 text-blue-100' :
-                            lead.contributedBy === 'Eden' ? 'bg-green-700 text-green-100' :
-                            'bg-gray-700 text-gray-100'
-                          }`}>
-                            {lead.contributedBy || 'Unknown'}
-                          </span>
+                          <select
+                            value={lead.status || 'uncalled'}
+                            onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
+                            className={`px-2 py-1 rounded text-xs font-medium border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                              (lead.status || 'uncalled') === 'called' 
+                                ? 'bg-green-700 text-green-100' 
+                                : 'bg-orange-700 text-orange-100'
+                            }`}
+                          >
+                            <option value="uncalled">Uncalled</option>
+                            <option value="called">Called</option>
+                          </select>
+                        </td>
+                        <td className="px-4 py-3">
+                          <input
+                            type="text"
+                            value={lead.notes || ''}
+                            onChange={(e) => updateLeadNotes(lead.id, e.target.value)}
+                            placeholder="Add notes..."
+                            className="w-full bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-xs focus:border-blue-400 focus:outline-none"
+                          />
                         </td>
                       </tr>
                     ))}

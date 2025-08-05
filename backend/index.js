@@ -49,8 +49,22 @@ db.serialize(() => {
     valueScore INTEGER,
     valueTier TEXT,
     contributedBy TEXT,
+    status TEXT DEFAULT 'uncalled',
+    notes TEXT DEFAULT '',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
+  
+  // Add status and notes columns if they don't exist (for existing databases)
+  db.run(`ALTER TABLE leads ADD COLUMN status TEXT DEFAULT 'uncalled'`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding status column:', err.message);
+    }
+  });
+  db.run(`ALTER TABLE leads ADD COLUMN notes TEXT DEFAULT ''`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding notes column:', err.message);
+    }
+  });
 });
 
 // API Routes
@@ -243,6 +257,52 @@ app.get('/api/leads', (req, res) => {
     console.log(`📊 API returning ${rows.length} leads to frontend`);
     res.json(rows);
   });
+});
+
+// Update lead status (called/uncalled)
+app.put('/api/leads/:id/status', (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    if (!status || !['called', 'uncalled'].includes(status)) {
+      return res.status(400).json({ error: 'Status must be either "called" or "uncalled"' });
+    }
+    
+    const stmt = db.prepare('UPDATE leads SET status = ? WHERE id = ?');
+    const result = stmt.run(status, id);
+    stmt.finalize();
+    
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Lead not found' });
+    }
+    
+    res.json({ message: 'Status updated successfully', id, status });
+  } catch (error) {
+    console.error('Error updating lead status:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Update lead notes
+app.put('/api/leads/:id/notes', (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+    
+    const stmt = db.prepare('UPDATE leads SET notes = ? WHERE id = ?');
+    const result = stmt.run(notes || '', id);
+    stmt.finalize();
+    
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Lead not found' });
+    }
+    
+    res.json({ message: 'Notes updated successfully', id, notes });
+  } catch (error) {
+    console.error('Error updating lead notes:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Health check
