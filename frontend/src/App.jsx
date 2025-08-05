@@ -14,6 +14,7 @@ function App() {
   const [filterValueTier, setFilterValueTier] = useState('');
   const [filterRating, setFilterRating] = useState('');
   const [filterCity, setFilterCity] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
   const [selectedCities, setSelectedCities] = useState([]);
@@ -195,6 +196,10 @@ function App() {
       filtered = filtered.filter(lead => lead.city === filterCity);
     }
     
+    if (filterStatus) {
+      filtered = filtered.filter(lead => (lead.status || 'uncalled') === filterStatus);
+    }
+    
     // Apply sorting
     filtered.sort((a, b) => {
       let aValue, bValue;
@@ -216,11 +221,6 @@ function App() {
         case 'createdAt':
           aValue = new Date(a.createdAt || 0).getTime();
           bValue = new Date(b.createdAt || 0).getTime();
-          break;
-        case 'status':
-          const statusOrder = { 'called': 3, 'unanswered': 2, 'uncalled': 1 };
-          aValue = statusOrder[a.status || 'uncalled'] || 1;
-          bValue = statusOrder[b.status || 'uncalled'] || 1;
           break;
         default: // name
           aValue = a.name || '';
@@ -578,6 +578,18 @@ function App() {
                 <option value="Standard">Standard</option>
               </select>
 
+              {/* Status Filter */}
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full bg-slate-700 border border-slate-500 rounded-lg px-3 py-3 text-white focus:border-blue-400 focus:outline-none touch-manipulation text-base"
+              >
+                <option value="">All Status</option>
+                <option value="called">🟢 Called</option>
+                <option value="unanswered">🟡 Unanswered</option>
+                <option value="uncalled">🟠 Uncalled</option>
+              </select>
+
               {/* Rating Filter */}
               <select
                 value={filterRating}
@@ -609,7 +621,6 @@ function App() {
                 <option value="valueTier">Sort by Value Tier</option>
                 <option value="city">Sort by City</option>
                 <option value="createdAt">Sort by Most Recent</option>
-                <option value="status">Sort by Status</option>
               </select>
 
               {/* Sort Order */}
@@ -662,6 +673,18 @@ function App() {
                 <option value="Standard">Standard</option>
               </select>
 
+              {/* Status Filter */}
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full sm:w-32 bg-slate-700 border border-slate-500 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none text-sm flex-shrink-0"
+              >
+                <option value="">All Status</option>
+                <option value="called">🟢 Called</option>
+                <option value="unanswered">🟡 Unanswered</option>
+                <option value="uncalled">🟠 Uncalled</option>
+              </select>
+
               {/* Rating Filter */}
               <select
                 value={filterRating}
@@ -693,7 +716,6 @@ function App() {
                 <option value="valueTier">Value Tier</option>
                 <option value="city">City</option>
                 <option value="createdAt">Most Recent</option>
-                <option value="status">Status</option>
               </select>
 
               {/* Sort Order */}
