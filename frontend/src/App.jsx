@@ -217,6 +217,11 @@ function App() {
           aValue = new Date(a.createdAt || 0).getTime();
           bValue = new Date(b.createdAt || 0).getTime();
           break;
+        case 'status':
+          const statusOrder = { 'called': 3, 'unanswered': 2, 'uncalled': 1 };
+          aValue = statusOrder[a.status || 'uncalled'] || 1;
+          bValue = statusOrder[b.status || 'uncalled'] || 1;
+          break;
         default: // name
           aValue = a.name || '';
           bValue = b.name || '';
@@ -604,6 +609,7 @@ function App() {
                 <option value="valueTier">Sort by Value Tier</option>
                 <option value="city">Sort by City</option>
                 <option value="createdAt">Sort by Most Recent</option>
+                <option value="status">Sort by Status</option>
               </select>
 
               {/* Sort Order */}
@@ -687,6 +693,7 @@ function App() {
                 <option value="valueTier">Value Tier</option>
                 <option value="city">City</option>
                 <option value="createdAt">Most Recent</option>
+                <option value="status">Status</option>
               </select>
 
               {/* Sort Order */}
