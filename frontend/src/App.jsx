@@ -866,67 +866,71 @@ function App() {
                     </div>
                     
                     {/* Contact Info */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <div>
+                    <div className="space-y-3 mb-3">
+                      <div className="grid grid-cols-1 gap-2">
+                        <div className="space-y-1">
+                          <div className="text-sm font-medium text-gray-300">Contact Info</div>
                           {lead.phone ? (
-                            <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm block touch-manipulation">
-                              📞 {lead.phone}
-                            </a>
-                          ) : (
-                            <span className="text-gray-500 text-sm">📞 No phone</span>
-                          )}
-                        </div>
-                        <div>
-                          {lead.email ? (
-                            <a href={`mailto:${lead.email}`} className="text-green-400 hover:text-green-300 text-sm block touch-manipulation">
-                              ✉️ {lead.email}
-                            </a>
-                          ) : (
-                            <span className="text-gray-500 text-sm">✉️ No email</span>
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        {lead.website ? (
-                          <div className="space-y-2">
                             <div>
-                              <a 
-                                href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1"
-                              >
-                                🌐 Website
+                              <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm touch-manipulation">
+                                📞 {lead.phone}
                               </a>
                             </div>
-                            <div className="flex items-center gap-2 justify-end">
-                              <button
-                                onClick={() => showPerformanceReport(lead.id)}
-                                className={`px-2 py-1 rounded text-xs font-bold cursor-pointer hover:scale-105 transition-transform touch-manipulation ${
-                                  (lead.performanceScore || 0) >= 70 ? 'bg-green-600 text-white' :
-                                  (lead.performanceScore || 0) >= 40 ? 'bg-yellow-600 text-white' :
-                                  (lead.performanceScore || 0) > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'
-                                }`}
-                                title="Website performance score - click for sales insights"
-                              >
-                                {lead.performanceScore || 0}
-                              </button>
-                              {(lead.performanceScore || 0) === 0 && (
-                                <button
-                                  onClick={() => analyzeLeadPerformance(lead.id)}
-                                  disabled={performanceLoading}
-                                  className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50 touch-manipulation"
-                                  title="Analyze website performance"
-                                >
-                                  {performanceLoading ? '⏳' : '🔍'}
-                                </button>
-                              )}
+                          ) : (
+                            <div className="text-gray-500 text-sm">📞 No phone</div>
+                          )}
+                          {lead.email ? (
+                            <div>
+                              <a href={`mailto:${lead.email}`} className="text-green-400 hover:text-green-300 text-sm touch-manipulation truncate block">
+                                📧 {lead.email}
+                              </a>
                             </div>
-                          </div>
-                        ) : (
-                          <span className="text-gray-500">No website</span>
-                        )}
+                          ) : (
+                            <div className="text-gray-500 text-sm">📧 No email</div>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <div className="text-sm font-medium text-gray-300">Website</div>
+                          {lead.website ? (
+                            <div className="space-y-2">
+                              <div>
+                                <a 
+                                  href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1 text-sm"
+                                >
+                                  🌐 Website
+                                </a>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => showPerformanceReport(lead.id)}
+                                  className={`px-2 py-1 rounded text-xs font-bold cursor-pointer hover:scale-105 transition-transform touch-manipulation ${
+                                    (lead.performanceScore || 0) >= 70 ? 'bg-green-600 text-white' :
+                                    (lead.performanceScore || 0) >= 40 ? 'bg-yellow-600 text-white' :
+                                    (lead.performanceScore || 0) > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'
+                                  }`}
+                                  title="Website performance score - click for sales insights"
+                                >
+                                  {lead.performanceScore || 0}
+                                </button>
+                                {(lead.performanceScore || 0) === 0 && (
+                                  <button
+                                    onClick={() => analyzeLeadPerformance(lead.id)}
+                                    disabled={performanceLoading}
+                                    className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50 touch-manipulation"
+                                    title="Analyze website performance"
+                                  >
+                                    {performanceLoading ? '⏳' : '🔍'}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-gray-500 text-sm">No website</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     
@@ -1025,29 +1029,30 @@ function App() {
                             {lead.valueTier || 'Standard'} ({lead.valueScore || 0})
                           </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3 min-w-[160px] max-w-[180px]">
                           <div className="space-y-1">
-                            {lead.phone ? (
-                              <div>
-                                <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm whitespace-nowrap">
-                                  📞 {lead.phone}
+                            <div className="flex items-center gap-1 text-blue-400">
+                              <span className="text-xs">📞</span>
+                              {lead.phone ? (
+                                <a 
+                                  href={`tel:${lead.phone}`}
+                                  className="hover:text-blue-300 hover:underline text-xs truncate"
+                                >
+                                  {lead.phone}
                                 </a>
-                              </div>
-                            ) : (
-                              <div className="text-gray-500 text-sm">📞 No phone</div>
-                            )}
-                            {lead.email ? (
-                              <div>
-                                <a href={`mailto:${lead.email}`} className="text-green-400 hover:text-green-300 text-sm whitespace-nowrap">
-                                  ✉️ {lead.email}
-                                </a>
-                              </div>
-                            ) : (
-                              <div className="text-gray-500 text-sm">✉️ No email</div>
-                            )}
+                              ) : (
+                                <span className="text-xs text-gray-500">No phone</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1 text-gray-400">
+                              <span className="text-xs">📧</span>
+                              <span className="text-xs truncate">
+                                {lead.email || 'No email'}
+                              </span>
+                            </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3 min-w-[140px] max-w-[160px]">
                           {lead.website ? (
                             <div className="space-y-2">
                               <div>
@@ -1055,15 +1060,15 @@ function App() {
                                   href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1 whitespace-nowrap"
+                                  className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1 text-xs"
                                 >
                                   🌐 Website
                                 </a>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
                                 <button
                                   onClick={() => showPerformanceReport(lead.id)}
-                                  className={`px-2 py-1 rounded text-xs font-bold cursor-pointer hover:scale-105 transition-transform ${
+                                  className={`px-1.5 py-0.5 rounded text-xs font-bold cursor-pointer hover:scale-105 transition-transform ${
                                     (lead.performanceScore || 0) >= 70 ? 'bg-green-600 text-white' :
                                     (lead.performanceScore || 0) >= 40 ? 'bg-yellow-600 text-white' :
                                     (lead.performanceScore || 0) > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'
@@ -1076,7 +1081,7 @@ function App() {
                                   <button
                                     onClick={() => analyzeLeadPerformance(lead.id)}
                                     disabled={performanceLoading}
-                                    className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50"
+                                    className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50"
                                     title="Analyze website performance"
                                   >
                                     {performanceLoading ? '⏳' : '🔍'}
@@ -1085,7 +1090,7 @@ function App() {
                               </div>
                             </div>
                           ) : (
-                            <span className="text-gray-500 whitespace-nowrap">No website</span>
+                            <span className="text-gray-500 text-xs">No website</span>
                           )}
                         </td>
                         <td className="px-4 py-3" style={{color: '#ffffff'}}>{lead.city}</td>
