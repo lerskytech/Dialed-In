@@ -28,6 +28,9 @@ function App() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showPerformanceModal, setShowPerformanceModal] = useState(false);
+  const [selectedLeadPerformance, setSelectedLeadPerformance] = useState(null);
+  const [performanceLoading, setPerformanceLoading] = useState(false);
 
   // City options
   const cityOptions = [
@@ -282,6 +285,63 @@ function App() {
     document.body.removeChild(link);
     
     setSuccess(`Downloaded ${leads.length} leads as JSON`);
+  };
+
+  // Performance Analysis Functions
+  const analyzeLeadPerformance = async (leadId) => {
+    try {
+      setPerformanceLoading(true);
+      const response = await fetch(`/api/leads/${leadId}/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Analysis failed');
+      }
+      
+      const result = await response.json();
+      setSuccess(`Performance analysis completed! Score: ${result.analysis.performanceScore}/100`);
+      
+      // Refresh leads to show updated scores
+      fetchLeads();
+      
+      return result;
+    } catch (error) {
+      console.error('Performance analysis error:', error);
+      setError(`Analysis failed: ${error.message}`);
+      return null;
+    } finally {
+      setPerformanceLoading(false);
+    }
+  };
+  
+  const showPerformanceReport = async (leadId) => {
+    try {
+      setPerformanceLoading(true);
+      const response = await fetch(`/api/leads/${leadId}/performance`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch performance data');
+      }
+      
+      const performanceData = await response.json();
+      setSelectedLeadPerformance(performanceData);
+      setShowPerformanceModal(true);
+    } catch (error) {
+      console.error('Error fetching performance data:', error);
+      setError(`Failed to load performance report: ${error.message}`);
+    } finally {
+      setPerformanceLoading(false);
+    }
   };
 
   // Search function
@@ -843,6 +903,37 @@ function App() {
                       </div>
                     </div>
                     
+                    {/* Performance Report */}
+                    {lead.website && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-300">Performance:</span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => showPerformanceReport(lead.id)}
+                            className={`px-3 py-1 rounded-full text-sm font-bold cursor-pointer hover:scale-105 transition-transform touch-manipulation ${
+                              (lead.performanceScore || 0) >= 80 ? 'bg-green-600 text-white' :
+                              (lead.performanceScore || 0) >= 60 ? 'bg-yellow-600 text-white' :
+                              (lead.performanceScore || 0) >= 40 ? 'bg-orange-600 text-white' :
+                              (lead.performanceScore || 0) > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'
+                            }`}
+                            title="Click for detailed performance report"
+                          >
+                            {lead.performanceScore || 0}/100
+                          </button>
+                          {(lead.performanceScore || 0) === 0 && (
+                            <button
+                              onClick={() => analyzeLeadPerformance(lead.id)}
+                              disabled={performanceLoading}
+                              className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50 touch-manipulation"
+                              title="Analyze website performance"
+                            >
+                              {performanceLoading ? '⏳' : '🔍'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
                     {/* Status & Notes */}
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
@@ -898,6 +989,7 @@ function App() {
                       <th className="px-4 py-3 text-gray-300 font-semibold">Phone/Email</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">Website</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">City</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Performance</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">Status</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">Notes</th>
                     </tr>
@@ -976,6 +1068,36 @@ function App() {
                         </td>
                         <td className="px-4 py-3" style={{color: '#ffffff'}}>{lead.city}</td>
                         <td className="px-4 py-3">
+                          {lead.website ? (
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => showPerformanceReport(lead.id)}
+                                className={`px-3 py-1 rounded-full text-sm font-bold cursor-pointer hover:scale-105 transition-transform ${
+                                  (lead.performanceScore || 0) >= 80 ? 'bg-green-600 text-white' :
+                                  (lead.performanceScore || 0) >= 60 ? 'bg-yellow-600 text-white' :
+                                  (lead.performanceScore || 0) >= 40 ? 'bg-orange-600 text-white' :
+                                  (lead.performanceScore || 0) > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'
+                                }`}
+                                title="Click for detailed performance report"
+                              >
+                                {lead.performanceScore || 0}/100
+                              </button>
+                              {(lead.performanceScore || 0) === 0 && (
+                                <button
+                                  onClick={() => analyzeLeadPerformance(lead.id)}
+                                  disabled={performanceLoading}
+                                  className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50"
+                                  title="Analyze website performance"
+                                >
+                                  {performanceLoading ? '⏳' : '🔍'}
+                                </button>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-gray-500 text-sm">No website</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
                           <select
                             value={lead.status || 'uncalled'}
                             onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
@@ -1010,6 +1132,151 @@ function App() {
           )}
         </div>
       </div>
+
+      {/* Performance Report Modal */}
+      {showPerformanceModal && selectedLeadPerformance && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-2">Performance Report</h2>
+                  <h3 className="text-lg text-blue-400">{selectedLeadPerformance.name}</h3>
+                  <p className="text-sm text-gray-400">{selectedLeadPerformance.website}</p>
+                </div>
+                <button
+                  onClick={() => setShowPerformanceModal(false)}
+                  className="text-gray-400 hover:text-white text-2xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Overall Score */}
+              <div className="mb-8">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`text-4xl font-bold px-6 py-3 rounded-full ${
+                    selectedLeadPerformance.performanceScore >= 80 ? 'bg-green-600 text-white' :
+                    selectedLeadPerformance.performanceScore >= 60 ? 'bg-yellow-600 text-white' :
+                    selectedLeadPerformance.performanceScore >= 40 ? 'bg-orange-600 text-white' :
+                    selectedLeadPerformance.performanceScore > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'
+                  }`}>
+                    {selectedLeadPerformance.performanceScore}/100
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-semibold text-white">Overall Performance Score</h4>
+                    <p className="text-gray-300">{selectedLeadPerformance.revenueImpact}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Score Breakdown */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-slate-700 rounded-lg p-4">
+                  <h4 className="text-lg font-semibold text-white mb-2">🚀 Page Speed</h4>
+                  <div className="text-2xl font-bold text-blue-400 mb-1">{selectedLeadPerformance.pagespeedScore}/100</div>
+                  <p className="text-sm text-gray-400">50% of total score</p>
+                </div>
+                <div className="bg-slate-700 rounded-lg p-4">
+                  <h4 className="text-lg font-semibold text-white mb-2">🎨 UI Quality</h4>
+                  <div className="text-2xl font-bold text-green-400 mb-1">{selectedLeadPerformance.uiScore}/100</div>
+                  <p className="text-sm text-gray-400">25% of total score</p>
+                </div>
+                <div className="bg-slate-700 rounded-lg p-4">
+                  <h4 className="text-lg font-semibold text-white mb-2">📱 Mobile</h4>
+                  <div className="text-2xl font-bold text-purple-400 mb-1">{selectedLeadPerformance.mobileScore}/100</div>
+                  <p className="text-sm text-gray-400">25% of total score</p>
+                </div>
+              </div>
+
+              {/* Revenue Impact Analysis */}
+              <div className="bg-slate-700 rounded-lg p-6 mb-6">
+                <h4 className="text-xl font-semibold text-white mb-3">💰 Revenue Impact Analysis</h4>
+                <p className="text-gray-300 mb-4">{selectedLeadPerformance.revenueImpact}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h5 className="font-semibold text-white mb-2">Performance Indicators:</h5>
+                    <ul className="text-sm text-gray-300 space-y-1">
+                      <li>• Page Speed: {selectedLeadPerformance.pagespeedScore >= 70 ? '✅ Good' : '⚠️ Needs Improvement'}</li>
+                      <li>• UI Modernization: {selectedLeadPerformance.uiScore >= 70 ? '✅ Modern' : '⚠️ Outdated'}</li>
+                      <li>• Mobile Experience: {selectedLeadPerformance.mobileScore >= 70 ? '✅ Optimized' : '⚠️ Poor'}</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-white mb-2">Business Impact:</h5>
+                    <ul className="text-sm text-gray-300 space-y-1">
+                      <li>• Conversion Rate: {selectedLeadPerformance.performanceScore >= 70 ? 'High' : 'Low'}</li>
+                      <li>• User Experience: {selectedLeadPerformance.performanceScore >= 60 ? 'Good' : 'Poor'}</li>
+                      <li>• SEO Ranking: {selectedLeadPerformance.pagespeedScore >= 60 ? 'Competitive' : 'Disadvantaged'}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recommendations */}
+              <div className="bg-slate-700 rounded-lg p-6 mb-6">
+                <h4 className="text-xl font-semibold text-white mb-3">🎯 Actionable Recommendations</h4>
+                <ul className="space-y-2">
+                  {selectedLeadPerformance.recommendations.map((rec, index) => (
+                    <li key={index} className="flex items-start gap-2 text-gray-300">
+                      <span className="text-blue-400 font-bold">•</span>
+                      <span>{rec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Technical Details */}
+              {selectedLeadPerformance.details && selectedLeadPerformance.details.pagespeed && (
+                <div className="bg-slate-700 rounded-lg p-6">
+                  <h4 className="text-xl font-semibold text-white mb-3">🔧 Technical Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <h5 className="font-semibold text-white mb-2">Core Web Vitals:</h5>
+                      <ul className="text-gray-300 space-y-1">
+                        {selectedLeadPerformance.details.pagespeed.metrics && (
+                          <>
+                            <li>• First Contentful Paint: {selectedLeadPerformance.details.pagespeed.metrics.fcp || 'N/A'}</li>
+                            <li>• Largest Contentful Paint: {selectedLeadPerformance.details.pagespeed.metrics.lcp || 'N/A'}</li>
+                            <li>• Cumulative Layout Shift: {selectedLeadPerformance.details.pagespeed.metrics.cls || 'N/A'}</li>
+                          </>
+                        )}
+                      </ul>
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-white mb-2">Analysis Date:</h5>
+                      <p className="text-gray-300">
+                        {selectedLeadPerformance.lastAnalyzed 
+                          ? new Date(selectedLeadPerformance.lastAnalyzed).toLocaleString()
+                          : 'Not analyzed yet'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 mt-6">
+                <button
+                  onClick={() => analyzeLeadPerformance(selectedLeadPerformance.leadId)}
+                  disabled={performanceLoading}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {performanceLoading ? '⏳ Analyzing...' : '🔄 Re-analyze'}
+                </button>
+                <button
+                  onClick={() => setShowPerformanceModal(false)}
+                  className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* User Settings Modal */}
       {showSettings && (
