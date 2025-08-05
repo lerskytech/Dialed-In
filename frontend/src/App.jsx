@@ -235,7 +235,7 @@ function App() {
     });
     
     return filtered;
-  }, [leads, filterCategory, filterValueTier, filterRating, filterCity, sortBy, sortOrder]);
+  }, [leads, filterCategory, filterValueTier, filterRating, filterCity, filterStatus, sortBy, sortOrder]);
 
   // Get unique cities from leads for filter dropdown
   const uniqueCities = useMemo(() => {
@@ -847,9 +847,9 @@ function App() {
                               : 'bg-orange-700 text-orange-100'
                           }`}
                         >
-                          <option value="uncalled">Uncalled</option>
+                          <option value="uncalled">No Call</option>
                           <option value="called">Called</option>
-                          <option value="unanswered">Unanswered</option>
+                          <option value="unanswered">No Ans</option>
                         </select>
                       </div>
                       <div>
@@ -955,7 +955,7 @@ function App() {
                           <select
                             value={lead.status || 'uncalled'}
                             onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
-                            className={`px-2 py-1 rounded text-xs font-medium border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                            className={`w-20 px-1 py-1 rounded text-xs font-medium border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                               (lead.status || 'uncalled') === 'called' 
                                 ? 'bg-green-700 text-green-100' 
                                 : (lead.status || 'uncalled') === 'unanswered'
@@ -963,9 +963,9 @@ function App() {
                                 : 'bg-orange-700 text-orange-100'
                             }`}
                           >
-                            <option value="uncalled">Uncalled</option>
+                            <option value="uncalled">No Call</option>
                             <option value="called">Called</option>
-                            <option value="unanswered">Unanswered</option>
+                            <option value="unanswered">No Ans</option>
                           </select>
                         </td>
                         <td className="px-4 py-3">
