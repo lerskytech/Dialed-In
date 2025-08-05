@@ -251,9 +251,9 @@ function App() {
     }
 
     const csvContent = "data:text/csv;charset=utf-8," + 
-      "Name,Rating,Reviews,Address,Phone,Website,Value Score,Value Tier,Contributed By\n" +
+      "Name,Rating,Reviews,Address,Phone,Email,Website,Value Score,Value Tier,Status,Notes,Contributed By\n" +
       leads.map(lead => 
-        `"${lead.name}",${lead.rating},${lead.reviewCount},"${lead.address}","${lead.phone || ''}","${lead.website || ''}",${lead.valueScore},"${lead.valueTier}","${lead.contributedBy}"`
+        `"${lead.name}",${lead.rating},${lead.reviewCount},"${lead.address}","${lead.phone || ''}","${lead.email || ''}","${lead.website || ''}",${lead.valueScore},"${lead.valueTier}","${lead.status || 'uncalled'}","${lead.notes || ''}","${lead.contributedBy}"`
       ).join("\n");
     
     const encodedUri = encodeURI(csvContent);
@@ -806,15 +806,26 @@ function App() {
                     </div>
                     
                     {/* Contact Info */}
-                    <div className="flex justify-between items-center">
-                      <div>
-                        {lead.phone ? (
-                          <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm block touch-manipulation">
-                            📞 {lead.phone}
-                          </a>
-                        ) : (
-                          <span className="text-gray-500 text-sm">📞 No phone</span>
-                        )}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          {lead.phone ? (
+                            <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm block touch-manipulation">
+                              📞 {lead.phone}
+                            </a>
+                          ) : (
+                            <span className="text-gray-500 text-sm">📞 No phone</span>
+                          )}
+                        </div>
+                        <div>
+                          {lead.email ? (
+                            <a href={`mailto:${lead.email}`} className="text-green-400 hover:text-green-300 text-sm block touch-manipulation">
+                              ✉️ {lead.email}
+                            </a>
+                          ) : (
+                            <span className="text-gray-500 text-sm">✉️ No email</span>
+                          )}
+                        </div>
                       </div>
                       <div>
                         {lead.website ? (
@@ -884,7 +895,7 @@ function App() {
                       <th className="px-4 py-3 text-gray-300 font-semibold">Business</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">Rating</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">Value</th>
-                      <th className="px-4 py-3 text-gray-300 font-semibold">Phone</th>
+                      <th className="px-4 py-3 text-gray-300 font-semibold">Phone/Email</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">Website</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">City</th>
                       <th className="px-4 py-3 text-gray-300 font-semibold">Status</th>
@@ -928,13 +939,26 @@ function App() {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          {lead.phone ? (
-                            <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 whitespace-nowrap">
-                              {lead.phone}
-                            </a>
-                          ) : (
-                            <span className="text-gray-500 whitespace-nowrap">No phone</span>
-                          )}
+                          <div className="space-y-1">
+                            {lead.phone ? (
+                              <div>
+                                <a href={`tel:${lead.phone}`} className="text-blue-400 hover:text-blue-300 text-sm whitespace-nowrap">
+                                  📞 {lead.phone}
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="text-gray-500 text-sm">📞 No phone</div>
+                            )}
+                            {lead.email ? (
+                              <div>
+                                <a href={`mailto:${lead.email}`} className="text-green-400 hover:text-green-300 text-sm whitespace-nowrap">
+                                  ✉️ {lead.email}
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="text-gray-500 text-sm">✉️ No email</div>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           {lead.website ? (

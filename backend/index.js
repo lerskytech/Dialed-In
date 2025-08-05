@@ -45,6 +45,7 @@ db.serialize(() => {
     city TEXT,
     category TEXT,
     phone TEXT,
+    email TEXT,
     website TEXT,
     valueScore INTEGER,
     valueTier TEXT,
@@ -63,6 +64,11 @@ db.serialize(() => {
   db.run(`ALTER TABLE leads ADD COLUMN notes TEXT DEFAULT ''`, (err) => {
     if (err && !err.message.includes('duplicate column')) {
       console.error('Error adding notes column:', err.message);
+    }
+  });
+  db.run(`ALTER TABLE leads ADD COLUMN email TEXT DEFAULT ''`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding email column:', err.message);
     }
   });
 });
