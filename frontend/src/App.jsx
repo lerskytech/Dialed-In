@@ -889,16 +889,18 @@ function App() {
                       </div>
                       <div>
                         {lead.website ? (
-                          <div className="space-y-1">
-                            <a 
-                              href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-green-400 hover:text-green-300 hover:underline text-sm block touch-manipulation"
-                            >
-                              🌐 Website
-                            </a>
-                            <div className="flex items-center gap-2">
+                          <div className="space-y-2">
+                            <div>
+                              <a 
+                                href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1"
+                              >
+                                🌐 Website
+                              </a>
+                            </div>
+                            <div className="flex items-center gap-2 justify-end">
                               <button
                                 onClick={() => showPerformanceReport(lead.id)}
                                 className={`px-2 py-1 rounded text-xs font-bold cursor-pointer hover:scale-105 transition-transform touch-manipulation ${
@@ -914,7 +916,7 @@ function App() {
                                 <button
                                   onClick={() => analyzeLeadPerformance(lead.id)}
                                   disabled={performanceLoading}
-                                  className="px-1 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50 touch-manipulation"
+                                  className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50 touch-manipulation"
                                   title="Analyze website performance"
                                 >
                                   {performanceLoading ? '⏳' : '🔍'}
@@ -923,7 +925,7 @@ function App() {
                             </div>
                           </div>
                         ) : (
-                          <span className="text-gray-500 text-sm">🌐 No website</span>
+                          <span className="text-gray-500">No website</span>
                         )}
                       </div>
                     </div>
@@ -1047,15 +1049,17 @@ function App() {
                         </td>
                         <td className="px-4 py-3">
                           {lead.website ? (
-                            <div className="space-y-1">
-                              <a 
-                                href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1 whitespace-nowrap"
-                              >
-                                🌐 Website
-                              </a>
+                            <div className="space-y-2">
+                              <div>
+                                <a 
+                                  href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-green-400 hover:text-green-300 hover:underline inline-flex items-center gap-1 whitespace-nowrap"
+                                >
+                                  🌐 Website
+                                </a>
+                              </div>
                               <div className="flex items-center gap-2">
                                 <button
                                   onClick={() => showPerformanceReport(lead.id)}
@@ -1072,7 +1076,7 @@ function App() {
                                   <button
                                     onClick={() => analyzeLeadPerformance(lead.id)}
                                     disabled={performanceLoading}
-                                    className="px-1 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50"
+                                    className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors disabled:opacity-50"
                                     title="Analyze website performance"
                                   >
                                     {performanceLoading ? '⏳' : '🔍'}
