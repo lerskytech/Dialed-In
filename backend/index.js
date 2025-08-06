@@ -664,6 +664,7 @@ app.post('/api/leads/:id/analyze', async (req, res) => {
 app.get('/api/leads/:id/performance', (req, res) => {
   try {
     const leadId = req.params.id;
+    console.log(`📊 Fetching performance data for lead ${leadId}`);
     
     const lead = db.prepare(`
       SELECT id, name, website, performanceScore, pagespeedScore, uiScore, mobileScore, 
@@ -672,6 +673,7 @@ app.get('/api/leads/:id/performance', (req, res) => {
     `).get(leadId);
     
     if (!lead) {
+      console.log(`❌ Lead ${leadId} not found`);
       return res.status(404).json({ error: 'Lead not found' });
     }
     
@@ -679,15 +681,38 @@ app.get('/api/leads/:id/performance', (req, res) => {
     try {
       performanceData = JSON.parse(lead.performanceData || '{}');
     } catch (e) {
+      console.log('⚠️ Failed to parse performance data, using empty object');
       performanceData = {};
     }
     
-    const revenueImpact = calculateRevenueImpact(lead.performanceScore || 0);
-    const recommendations = performanceData.pagespeed && performanceData.ui && performanceData.mobile 
-      ? generateRecommendations(performanceData.pagespeed, performanceData.ui, performanceData.mobile)
-      : ['Analysis not available - click "Analyze" to generate performance report'];
+    // Safe revenue impact calculation with fallback
+    let revenueImpact = 'Unable to calculate revenue impact';
+    try {
+      revenueImpact = calculateRevenueImpact(lead.performanceScore || 0);
+    } catch (e) {
+      console.log('⚠️ Revenue impact calculation failed, using fallback');
+      const score = lead.performanceScore || 0;
+      if (score >= 70) revenueImpact = 'Good Revenue Potential - Strong performance supports growth';
+      else if (score >= 40) revenueImpact = 'Moderate Revenue Potential - Performance improvements could boost revenue';
+      else revenueImpact = 'Low Revenue Potential - Performance issues likely hurt conversions';
+    }
     
-    res.json({
+    // Safe recommendations generation with fallback
+    let recommendations = ['Analysis not available - click "Analyze" to generate performance report'];
+    try {
+      if (performanceData.pagespeed && performanceData.ui && performanceData.mobile) {
+        recommendations = generateRecommendations(performanceData.pagespeed, performanceData.ui, performanceData.mobile);
+      }
+    } catch (e) {
+      console.log('⚠️ Recommendations generation failed, using fallback');
+      recommendations = [
+        'Website performance analysis needed',
+        'Click "Analyze" button to generate detailed insights',
+        'Performance scoring will help identify improvement opportunities'
+      ];
+    }
+    
+    const response = {
       leadId: lead.id,
       name: lead.name,
       website: lead.website,
@@ -699,10 +724,17 @@ app.get('/api/leads/:id/performance', (req, res) => {
       revenueImpact,
       recommendations,
       details: performanceData
-    });
+    };
+    
+    console.log(`✅ Performance data fetched successfully for lead ${leadId}`);
+    res.json(response);
   } catch (error) {
     console.error('❌ Error fetching performance data:', error);
-    res.status(500).json({ error: error.message });
+    console.error('❌ Stack trace:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to fetch performance data',
+      details: error.message 
+    });
   }
 });
 
