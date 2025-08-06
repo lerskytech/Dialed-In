@@ -603,9 +603,20 @@ app.get('/api/test', (req, res) => {
 app.get('/api/version', (req, res) => {
   console.log('🔖 Version endpoint called');
   res.json({ 
-    version: '2025-01-06-v3-ultra-simple', 
+    version: '2025-01-06-v4-force-deploy', 
     timestamp: new Date().toISOString(),
-    message: 'Ultra-simple endpoints deployed to fix 502 errors'
+    message: 'Force deployment - ultra-simple endpoints to fix 502 errors'
+  });
+});
+
+// Force deployment endpoint - unique name to trigger update
+app.get('/api/force-deploy-check', (req, res) => {
+  console.log('🚀 Force deploy check called');
+  res.json({ 
+    status: 'NEW CODE DEPLOYED', 
+    version: '2025-01-06-v4-force-deploy',
+    timestamp: new Date().toISOString(),
+    message: 'This endpoint proves new code is running in production'
   });
 });
 
