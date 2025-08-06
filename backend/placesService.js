@@ -313,12 +313,48 @@ async function fetchPlaceDetails(placeId, apiKey) {
     return {};
   }
   
-  // Extract email from editorial summary if available
+  // Enhanced email detection - check multiple fields
   let email = null;
+  
+  // Check editorial summary first (most common source)
   if (data.editorialSummary && data.editorialSummary.text) {
     const emailMatch = data.editorialSummary.text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
     if (emailMatch) {
       email = emailMatch[0];
+    }
+  }
+  
+  // If no email found, check other potential fields
+  if (!email) {
+    // Check reviews for email mentions (sometimes customers post business emails)
+    if (data.reviews && Array.isArray(data.reviews)) {
+      for (const review of data.reviews.slice(0, 5)) { // Check first 5 reviews only
+        if (review.text && review.text.originalText) {
+          const emailMatch = review.text.originalText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+          if (emailMatch) {
+            email = emailMatch[0];
+            break;
+          }
+        }
+      }
+    }
+  }
+  
+  // Generate common business email patterns if we have website but no email
+  if (!email && data.websiteUri) {
+    try {
+      const domain = new URL(data.websiteUri).hostname.replace('www.', '');
+      // Common business email patterns - these are educated guesses
+      const commonPatterns = [
+        `info@${domain}`,
+        `contact@${domain}`,
+        `hello@${domain}`,
+        `admin@${domain}`
+      ];
+      // Use the most common pattern (info@) as a reasonable guess
+      email = commonPatterns[0];
+    } catch (e) {
+      // Invalid URL, skip email generation
     }
   }
   
