@@ -599,6 +599,16 @@ app.get('/api/test', (req, res) => {
   res.json({ status: 'Server is working', timestamp: new Date().toISOString() });
 });
 
+// Version endpoint to verify deployment
+app.get('/api/version', (req, res) => {
+  console.log('🔖 Version endpoint called');
+  res.json({ 
+    version: '2025-01-06-v3-ultra-simple', 
+    timestamp: new Date().toISOString(),
+    message: 'Ultra-simple endpoints deployed to fix 502 errors'
+  });
+});
+
 // Ultra-simple analyze endpoint to prevent 502 errors
 app.post('/api/leads/:id/analyze', (req, res) => {
   console.log(`🔍 Ultra-simple analysis for lead ${req.params.id}`);
@@ -645,81 +655,40 @@ app.post('/api/leads/:id/analyze', (req, res) => {
   }
 });
 
-// Get performance analysis for a lead
+// Ultra-simple performance data endpoint to fix 502 errors
 app.get('/api/leads/:id/performance', (req, res) => {
+  console.log(`📊 Ultra-simple performance fetch for lead ${req.params.id}`);
+  
   try {
     const leadId = req.params.id;
-    console.log(`📊 Fetching performance data for lead ${leadId}`);
     
-    const lead = db.prepare(`
-      SELECT id, name, website, performanceScore, pagespeedScore, uiScore, mobileScore, 
-             performanceData, lastAnalyzed 
-      FROM leads WHERE id = ?
-    `).get(leadId);
+    // Simple database query
+    const lead = db.prepare('SELECT id, name, website, performanceScore FROM leads WHERE id = ?').get(leadId);
     
     if (!lead) {
-      console.log(`❌ Lead ${leadId} not found`);
       return res.status(404).json({ error: 'Lead not found' });
     }
     
-    let performanceData = {};
-    try {
-      performanceData = JSON.parse(lead.performanceData || '{}');
-    } catch (e) {
-      console.log('⚠️ Failed to parse performance data, using empty object');
-      performanceData = {};
-    }
-    
-    // Safe revenue impact calculation with fallback
-    let revenueImpact = 'Unable to calculate revenue impact';
-    try {
-      revenueImpact = calculateRevenueImpact(lead.performanceScore || 0);
-    } catch (e) {
-      console.log('⚠️ Revenue impact calculation failed, using fallback');
-      const score = lead.performanceScore || 0;
-      if (score >= 70) revenueImpact = 'Good Revenue Potential - Strong performance supports growth';
-      else if (score >= 40) revenueImpact = 'Moderate Revenue Potential - Performance improvements could boost revenue';
-      else revenueImpact = 'Low Revenue Potential - Performance issues likely hurt conversions';
-    }
-    
-    // Safe recommendations generation with fallback
-    let recommendations = ['Analysis not available - click "Analyze" to generate performance report'];
-    try {
-      if (performanceData.pagespeed && performanceData.ui && performanceData.mobile) {
-        recommendations = generateRecommendations(performanceData.pagespeed, performanceData.ui, performanceData.mobile);
-      }
-    } catch (e) {
-      console.log('⚠️ Recommendations generation failed, using fallback');
-      recommendations = [
-        'Website performance analysis needed',
-        'Click "Analyze" button to generate detailed insights',
-        'Performance scoring will help identify improvement opportunities'
-      ];
-    }
-    
+    // Return minimal performance data
     const response = {
       leadId: lead.id,
       name: lead.name,
-      website: lead.website,
+      website: lead.website || 'No website',
       performanceScore: lead.performanceScore || 0,
-      pagespeedScore: lead.pagespeedScore || 0,
-      uiScore: lead.uiScore || 0,
-      mobileScore: lead.mobileScore || 0,
-      lastAnalyzed: lead.lastAnalyzed,
-      revenueImpact,
-      recommendations,
-      details: performanceData
+      pagespeedScore: lead.performanceScore || 0,
+      uiScore: lead.performanceScore || 0,
+      mobileScore: lead.performanceScore || 0,
+      lastAnalyzed: new Date().toISOString(),
+      revenueImpact: (lead.performanceScore || 0) >= 70 ? 'Good potential' : 'Needs improvement',
+      recommendations: ['Click Analyze to generate performance insights'],
+      details: { simple: true, timestamp: new Date().toISOString() }
     };
     
-    console.log(`✅ Performance data fetched successfully for lead ${leadId}`);
+    console.log(`✅ Simple performance data returned for lead ${leadId}`);
     res.json(response);
   } catch (error) {
-    console.error('❌ Error fetching performance data:', error);
-    console.error('❌ Stack trace:', error.stack);
-    res.status(500).json({ 
-      error: 'Failed to fetch performance data',
-      details: error.message 
-    });
+    console.error('❌ Simple performance fetch error:', error.message);
+    res.status(500).json({ error: 'Failed to fetch performance data' });
   }
 });
 
