@@ -8,6 +8,7 @@
     "concurrently": "^8.2.2"
   },
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.4.2",
     "express": "^5.1.0",
     "sqlite3": "^5.1.7"
   }
