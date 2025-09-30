@@ -1,0 +1,13 @@
+{
+  "name": "spreeleads-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "npm run build -C frontend && concurrently \"npm run start -C backend\" \"npm run preview -C frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  }
+}
