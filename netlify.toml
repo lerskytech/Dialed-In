@@ -1,16 +1,15 @@
 # Netlify configuration for a monorepo
 
 [build]
-  # The base directory for the build, relative to the root of the repository.
-  # This is the root of the monorepo.
-  base = "/"
+  # Set the base directory to the frontend folder
+  base = "frontend"
   # The command to build the frontend application
-  command = "npm run build -w frontend"
-  # The directory that contains the built frontend assets
-  publish = "frontend/dist"
+  command = "npm run build"
+  # The directory that contains the built assets, relative to the base directory
+  publish = "dist"
 
 [functions]
-  # The directory that contains the serverless functions
+  # The directory for serverless functions, relative to the root of the repository
   directory = "frontend/netlify/functions"
 
 # Redirects for API calls and single-page application routing
