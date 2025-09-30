@@ -33,7 +33,6 @@ const LoginPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-4">
       <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-8 w-full max-w-md">
         <div className="text-center">
-          <img src="/SL1.png" alt="Dialed-In Logo" className="w-24 h-24 mx-auto mb-4" />
           <p className="text-sm text-gray-400 mt-2">Private Access Required</p>
         </div>
 
