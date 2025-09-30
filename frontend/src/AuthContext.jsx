@@ -1,76 +1,106 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import jwtDecode from 'jwt-decode';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(() => localStorage.getItem('spreeleads-token'));
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState('');
 
   useEffect(() => {
-    // Check for stored token and user name on app load
-    const storedToken = localStorage.getItem('dialed-in-token');
-    const storedUserName = localStorage.getItem('dialed-in-user-name');
-    if (storedToken && storedUserName) {
-      setToken(storedToken);
-      setUserName(storedUserName);
-      setIsAuthenticated(true);
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        if (decoded.exp * 1000 > Date.now()) {
+          setIsAuthenticated(true);
+        } else {
+          // Token expired
+          setIsAuthenticated(false);
+          localStorage.removeItem('spreeleads-token');
+        }
+      } catch (e) {
+        // Invalid token
+        setIsAuthenticated(false);
+        localStorage.removeItem('spreeleads-token');
+      }
+    } else {
+      setIsAuthenticated(false);
     }
     setLoading(false);
-  }, []);
+  }, [token]);
 
-  const login = (accessToken) => {
-    // Token to user mapping
-    const tokenUserMap = {
-      'dialed-in-partner-access-2024': 'Skyler',
-      'dialed-in-business-partner-2024': 'Eden'
-    };
-    
-    if (tokenUserMap[accessToken]) {
-      setToken(accessToken);
-      setUserName(tokenUserMap[accessToken]);
-      setIsAuthenticated(true);
-      localStorage.setItem('dialed-in-token', accessToken);
-      localStorage.setItem('dialed-in-user-name', tokenUserMap[accessToken]);
-      return true;
+  const login = async (email, password, token) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, token }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, message: data.message || 'Login failed.' };
+      }
+
+      if (data.token) {
+        setToken(data.token);
+        localStorage.setItem('spreeleads-token', data.token);
+      }
+      
+      return data; // This will include { success: true, ... } or { twoFactorRequired: true, ... }
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, message: 'Could not connect to the server.' };
     }
-    return false;
+  };
+
+  const register = async (email, password) => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, message: data.message || 'Registration failed.' };
+      }
+
+      return data; // This will include { success: true, userId, qrCodeUrl }
+    } catch (error) {
+      console.error('Registration error:', error);
+      return { success: false, message: 'Could not connect to the server.' };
+    }
   };
 
   const logout = () => {
+    localStorage.removeItem('spreeleads-token');
     setToken(null);
-    setUserName('');
-    setIsAuthenticated(false);
-    localStorage.removeItem('dialed-in-token');
-    localStorage.removeItem('dialed-in-user-name');
   };
 
-  const getAuthHeaders = () => {
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
+  const getAuthHeaders = useCallback(() => {
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+  }, [token]);
 
   const value = {
     isAuthenticated,
     token,
-    userName,
+    loading,
     login,
+    register,
     logout,
     getAuthHeaders,
-    loading
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

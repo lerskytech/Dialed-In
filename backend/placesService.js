@@ -1,3 +1,6 @@
+const { Client } = require("@googlemaps/google-maps-services-js");
+const googleMapsClient = new Client({});
+
 // Simple Google Places API Lead Generation - REAL DATA ONLY
 
 async function searchPlaces(city, category, apiKey, maxLeads = 25) {
@@ -13,7 +16,9 @@ async function searchPlaces(city, category, apiKey, maxLeads = 25) {
     const primaryTerm = `${category} ${city}`;
     console.log(`🔍 Searching for: ${primaryTerm}`);
     
-    const allLeads = await fetchGooglePlacesData(primaryTerm, GOOGLE_PLACES_API_KEY, maxLeads);
+        const locationBias = await getGeocodedLocationBias(city, GOOGLE_PLACES_API_KEY);
+
+    const allLeads = await fetchGooglePlacesData(primaryTerm, GOOGLE_PLACES_API_KEY, maxLeads, locationBias);
     console.log(`✅ Found ${allLeads.length} real businesses`);
     
     if (allLeads.length === 0) {
@@ -31,9 +36,9 @@ async function searchPlaces(city, category, apiKey, maxLeads = 25) {
     const limitedLeads = rankedLeads.slice(0, maxLeads);
     console.log(`🎯 Limited to ${limitedLeads.length} leads before enrichment`);
     
-    // Enrich only the limited set with phone numbers to save time
-    const enrichedLeads = await enrichLeadsWithPhoneNumbers(limitedLeads, GOOGLE_PLACES_API_KEY);
-    console.log(`📞 Final result: ${enrichedLeads.length} leads with phone numbers`);
+    // Enrich the limited set with details like phone numbers and emails
+    const enrichedLeads = await enrichLeads(limitedLeads, GOOGLE_PLACES_API_KEY);
+    console.log(`📞 Final result: ${enrichedLeads.length} enriched leads`);
     
     return enrichedLeads;
     
@@ -80,7 +85,7 @@ function generateSearchTerms(city, category) {
 }
 
 // Fetch data from Google Places API (New) Text Search with pagination support
-async function fetchGooglePlacesData(query, apiKey, maxLeads = 25) {
+async function fetchGooglePlacesData(query, apiKey, maxLeads = 25, locationBias) {
   const url = 'https://places.googleapis.com/v1/places:searchText';
   const allPlaces = [];
   let nextPageToken = null;
@@ -94,10 +99,7 @@ async function fetchGooglePlacesData(query, apiKey, maxLeads = 25) {
       textQuery: query,
       maxResultCount: 20, // Google Places API (New) max per request
       locationBias: {
-        rectangle: {
-          low: { latitude: 25.7617, longitude: -80.1918 }, // Miami area - will be dynamic later
-          high: { latitude: 25.7817, longitude: -80.1718 }
-        }
+        rectangle: locationBias
       }
     };
     
@@ -250,45 +252,49 @@ function getValueTier(score) {
   return 'Standard';
 }
 
-// Enrich leads with phone numbers using Google Places Details API (with timeout protection)
-async function enrichLeadsWithPhoneNumbers(leads, apiKey) {
-  console.log(`📞 Enriching ${leads.length} leads with phone numbers...`);
+// Enrich leads with details like phone, website, and email
+async function enrichLeads(leads, apiKey) {
+  console.log(`✨ Enriching ${leads.length} leads with details...`);
   const enrichedLeads = [];
-  
-  // Process in smaller batches to prevent timeouts
-  const batchSize = 5;
-  for (let i = 0; i < leads.length; i += batchSize) {
-    const batch = leads.slice(i, i + batchSize);
-    
-    for (const lead of batch) {
-      try {
-        // Add timeout to prevent hanging
-        const details = await Promise.race([
-          fetchPlaceDetails(lead.googlePlaceId, apiKey),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
-        ]);
-        
-        enrichedLeads.push({
-          ...lead,
-          phone: details.phone || null,
-          website: details.website || null,
-          email: details.email || null
-        });
-      } catch (error) {
-        // Keep the lead even if enrichment fails or times out
-        enrichedLeads.push({
-          ...lead,
-          phone: null,
-          website: null,
-          email: null
-        });
+
+  for (const lead of leads) {
+    try {
+      const details = await Promise.race([
+        fetchPlaceDetails(lead.googlePlaceId, apiKey),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
+      ]);
+
+      let finalEmail = details.email;
+
+      // If no email from Places API, try scraping the website
+      if (!finalEmail && details.website) {
+        finalEmail = await scrapeEmailFromWebsite(details.website);
       }
+
+      // If still no email, fall back to guessing based on domain
+      if (!finalEmail && details.website) {
+        try {
+          const domain = new URL(details.website).hostname.replace('www.', '');
+          finalEmail = `info@${domain}`; // Best guess
+        } catch (e) { /* Invalid URL */ }
+      }
+
+      enrichedLeads.push({
+        ...lead,
+        phone: details.phone || lead.phone || null,
+        website: details.website || lead.website || null,
+        email: finalEmail
+      });
+    } catch (error) {
+      // Keep the lead even if enrichment fails
+      enrichedLeads.push({
+        ...lead,
+        email: null // Ensure email is null if enrichment fails
+      });
     }
     
-    // Small delay between batches
-    if (i + batchSize < leads.length) {
-      await new Promise(resolve => setTimeout(resolve, 200));
-    }
+    // Small delay between each enrichment to avoid rate-limiting
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
   
   return enrichedLeads;
@@ -363,6 +369,66 @@ async function fetchPlaceDetails(placeId, apiKey) {
     website: data.websiteUri || null,
     email: email,
     businessStatus: data.businessStatus || null
+  };
+}
+
+// Scrape a website to find an email address
+async function scrapeEmailFromWebsite(url) {
+  if (!url) return null;
+
+  try {
+    const { data } = await axios.get(url, { timeout: 5000 });
+    const $ = cheerio.load(data);
+
+    // 1. Look for mailto links (most reliable)
+    const mailto = $('a[href^="mailto:"]').first().attr('href');
+    if (mailto) {
+      return mailto.replace('mailto:', '');
+    }
+
+    // 2. Look for email patterns in the text
+    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+    const text = $('body').text();
+    const emails = text.match(emailRegex);
+    if (emails && emails.length > 0) {
+      // Prefer common business emails if available
+      const preferred = emails.find(e => e.startsWith('info@') || e.startsWith('contact@') || e.startsWith('support@'));
+      return preferred || emails[0];
+    }
+
+    return null;
+  } catch (error) {
+    // console.error(`Failed to scrape ${url}: ${error.message}`);
+    return null;
+  }
+}
+
+async function getGeocodedLocationBias(city, apiKey) {
+  try {
+    const response = await googleMapsClient.geocode({
+      params: {
+        address: city,
+        key: apiKey,
+      },
+      timeout: 1000, // 1 second timeout
+    });
+
+    if (response.data.results.length > 0) {
+      const { lat, lng } = response.data.results[0].geometry.location;
+      const viewport = response.data.results[0].geometry.viewport;
+      console.log(`🌍 Geocoded ${city} to:`, viewport);
+      return {
+        low: { latitude: viewport.southwest.lat, longitude: viewport.southwest.lng },
+        high: { latitude: viewport.northeast.lat, longitude: viewport.northeast.lng },
+      };
+    }
+  } catch (e) {
+    console.error('Geocoding API error:', e.message);
+  }
+  // Fallback to a wider region if geocoding fails
+  return {
+    low: { latitude: -90, longitude: -180 },
+    high: { latitude: 90, longitude: 180 },
   };
 }
 

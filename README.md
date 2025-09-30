@@ -1,6 +1,6 @@
-# LeadNavigatorAI 2.0
+# SpreeLeads
 
-Welcome to **LeadNavigatorAI 2.0**, a powerful, full-stack lead generation tool rebuilt from the ground up for stability, scalability, and a professional user experience. This version replaces the previous fragile web scraper with the official **Google Places API** and introduces a persistent **SQLite database**, transforming it into a robust platform for discovering and managing business leads.
+Welcome to **SpreeLeads**, a powerful, full-stack lead generation tool designed for scalability and a professional user experience. It leverages the official **Google Places API** and a persistent **SQLite database** to provide a robust platform for discovering and managing business leads.
 
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)](#)
 [![Users](https://img.shields.io/badge/Users-Skyler%20%26%20Eden-blue.svg)](#)
@@ -13,7 +13,7 @@ Welcome to **LeadNavigatorAI 2.0**, a powerful, full-stack lead generation tool 
 ```bash
 # Clone and install
 git clone <repository-url>
-cd LeadNavigatorAI
+cd SpreeLeads
 npm install
 
 # Configure environment
@@ -58,7 +58,7 @@ open http://localhost:5174/
 ## 🏗️ Architecture
 
 ```
-/LeadNavigatorAI
+/SpreeLeads
   /backend
     - index.js
     - scraper.js

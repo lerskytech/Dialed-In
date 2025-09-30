@@ -2,23 +2,56 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 
 const UserSettings = ({ onClose }) => {
-  const { token } = useAuth();
+  const { getAuthHeaders } = useAuth();
   const [apiKey, setApiKey] = useState('');
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Load existing API key for this user
-    if (token) {
-      const savedApiKey = localStorage.getItem(`dialed-in-api-key-${token}`);
-      if (savedApiKey) {
-        setApiKey(savedApiKey);
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/user', {
+          headers: getAuthHeaders(),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data);
+          if (data.api_key) {
+            setApiKey(data.api_key);
+          }
+        } else {
+          setError('Failed to load user data.');
+        }
+      } catch (err) {
+        setError('Could not connect to the server.');
       }
-    }
-  }, [token]);
+    };
 
-  const handleSaveApiKey = (e) => {
+    fetchUserData();
+  }, []);
+
+  const handleUpgrade = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:3001/api/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        const { url } = await response.json();
+        window.location.href = url; // Redirect to Stripe Checkout
+      } else {
+        setError('Failed to start the upgrade process.');
+      }
+    } catch (err) {
+      setError('Could not connect to the server.');
+    }
+    setLoading(false);
+  };
+
+  const handleSaveApiKey = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -30,68 +63,80 @@ const UserSettings = ({ onClose }) => {
       return;
     }
 
-    // Basic API key format validation
-    if (!apiKey.startsWith('AIza') || apiKey.length < 30) {
-      setError('Invalid API key format. Google Places API keys start with "AIza" and are longer.');
-      setLoading(false);
-      return;
-    }
+    try {
+      const response = await fetch('http://localhost:3001/api/user/api-key', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({ apiKey }),
+      });
 
-    // Save API key for this user
-    localStorage.setItem(`4aivr-api-key-${token}`, apiKey);
-    setSuccess('API key saved successfully! You can now search for leads using your own Google Places quota.');
+      if (response.ok) {
+        setSuccess('API key saved successfully!');
+      } else {
+        setError('Failed to save API key.');
+      }
+    } catch (err) {
+      setError('Could not connect to the server.');
+    }
     setLoading(false);
   };
 
-  const handleTestApiKey = async () => {
-    if (!apiKey.trim()) {
-      setError('Please enter an API key first');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      // Test the API key with a simple search
-      const response = await fetch('http://localhost:3002/api/test-api-key', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ apiKey })
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setSuccess('✅ API key is valid and working!');
-      } else {
-        setError(`❌ API key test failed: ${result.error}`);
-      }
-    } catch (err) {
-      setError('❌ Could not test API key. Please check your connection.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 sm:p-6 w-full max-w-2xl">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-start justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 w-full max-w-lg mx-auto my-8">
         <div className="flex justify-between items-center mb-4 sm:mb-6">
           <h2 className="text-lg sm:text-xl font-bold text-white">User Settings</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-xl p-2 touch-manipulation"
+            className="bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 px-4 rounded-lg text-sm"
           >
-            ×
+            Close
           </button>
         </div>
 
+        {userData && (
+          <div className="mb-6 p-4 bg-slate-700 rounded-lg">
+            <h3 className="text-md font-semibold text-white mb-2">Subscription Details</h3>
+            <p className="text-sm text-gray-300">Plan: <span className="font-bold capitalize">{userData.subscription_tier}</span></p>
+            <p className="text-sm text-gray-300">Monthly Usage: <span className="font-bold">{userData.api_usage} / {userData.monthly_limit}</span> leads</p>
+            <div className="w-full bg-gray-600 rounded-full h-2.5 mt-2">
+              <div className="bg-blue-500 h-2.5 rounded-full" style={{ width: `${(userData.api_usage / userData.monthly_limit) * 100}%` }}></div>
+            </div>
+            {userData.subscription_tier === 'free' && (
+              <button
+                onClick={handleUpgrade}
+                disabled={loading}
+                className="mt-4 w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                {loading ? 'Redirecting...' : 'Upgrade to Pro (5,000 leads/month for $59.99)'}
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Cost Tracking (Estimate)</h3>
+            <div className="p-4 bg-slate-700 rounded-lg space-y-3">
+              <p className="text-sm text-gray-300">The Places API (New) has a cost associated with each lead found. We estimate this to be around <span className="font-bold text-white">$0.03 per lead</span>.</p>
+              {userData && (
+                <div>
+                  <p className="text-sm text-gray-300">Your estimated usage cost this month:</p>
+                  <p className="text-2xl font-bold text-white">${(userData.api_usage * 0.03).toFixed(2)}</p>
+                </div>
+              )}
+              <div className="bg-green-900/50 border border-green-600 rounded p-3">
+                <h4 className="text-sm font-semibold text-green-200 mb-1">Take Advantage of Google's Free Tier!</h4>
+                <p className="text-xs text-green-300">Google Cloud offers a <span className="font-bold">$200 monthly credit</span> for Maps Platform products. For most users, this means your usage on SpreeLeads will be free. Always check your Google Cloud billing account for the most accurate cost information.</p>
+              </div>
+            </div>
+          </div>
+
+
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Google Places API Key</h3>
             <p className="text-sm text-gray-300 mb-4">
@@ -132,15 +177,6 @@ const UserSettings = ({ onClose }) => {
                   className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-3 sm:py-2 rounded-lg transition-colors touch-manipulation text-base sm:text-sm font-medium"
                 >
                   {loading ? 'Saving...' : 'Save API Key'}
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={handleTestApiKey}
-                  disabled={loading || !apiKey.trim()}
-                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-3 sm:py-2 rounded-lg transition-colors touch-manipulation text-base sm:text-sm font-medium"
-                >
-                  Test API Key
                 </button>
               </div>
             </form>
