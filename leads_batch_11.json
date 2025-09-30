@@ -1,0 +1,32 @@
+{
+  "leads": [
+    {
+      "name": "Dallas Immigration Attorney Associates 1001",
+      "rating": 3.6,
+      "reviewCount": 448,
+      "address": "2000 Main St, Dallas, TX, USA",
+      "googlePlaceId": "ChIJImmigrationAttorney1000",
+      "city": "Dallas, TX",
+      "category": "Immigration Attorney",
+      "phone": "(617) 873-4955",
+      "website": "https://immigrationattorney1000.com",
+      "valueScore": 85,
+      "valueTier": "Premium",
+      "contributedBy": "Skyler"
+    },
+    {
+      "name": "Asheville Personal Injury Attorney Specialists 1002",
+      "rating": 4.7,
+      "reviewCount": 406,
+      "address": "2001 Main St, Asheville, NC, USA",
+      "googlePlaceId": "ChIJPersonalInjuryAttorney1001",
+      "city": "Asheville, NC",
+      "category": "Personal Injury Attorney",
+      "phone": "(482) 233-6314",
+      "website": null,
+      "valueScore": 92,
+      "valueTier": "Premium",
+      "contributedBy": "Skyler"
+    }
+  ]
+}
