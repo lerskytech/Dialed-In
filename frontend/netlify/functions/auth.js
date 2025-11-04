@@ -1,4 +1,8 @@
 const serverless = require('serverless-http');
-const { app } = require('../../../backend/auth.js');
+const initialize = require('../../../backend/server');
 
-module.exports.handler = serverless(app);
+module.exports.handler = async (event, context) => {
+  const app = await initialize();
+  const handler = serverless(app);
+  return await handler(event, context);
+};
