@@ -23,7 +23,7 @@ const AppRouter = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/verify-2fa" element={<Verify2FAPage />} />
-        <Route path="/*" element={<PrivateRoute><MainLayout /></PrivateRoute>} />
+        <Route path="/*" element={<MainLayout />} />
       </Routes>
     </BrowserRouter>
   );
