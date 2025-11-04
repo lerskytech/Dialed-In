@@ -5,7 +5,6 @@ const { searchPlaces } = require('./placesService');
 const database = require('./database');
 const { authRouter, authenticateToken } = require('./auth');
 const { createCheckoutSession, handleWebhookEvent } = require('./stripe');
-const { loadLocations, clearLocations, searchLocations } = require('./locations');
 
 
 // Fail-fast environment variable validation
@@ -168,15 +167,33 @@ app.post('/api/search', authenticateToken, async (req, res) => {
   }
 });
 
-app.get('/api/locations', authenticateToken, async (req, res) => {
-  try {
-    const { search } = req.query;
-    const results = await searchLocations(search);
-    res.json(results);
-  } catch (error) {
-    console.error('Error searching locations:', error);
-    res.status(500).json({ error: 'Failed to search location data' });
-  }
+app.get('/api/locations/states', authenticateToken, async (req, res) => {
+  database.db.all('SELECT DISTINCT state_name FROM locations ORDER BY state_name', [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(rows.map(r => r.state_name));
+  });
+});
+
+app.get('/api/locations/counties', authenticateToken, async (req, res) => {
+  const { state } = req.query;
+  database.db.all('SELECT DISTINCT county_name FROM locations WHERE state_name = ? ORDER BY county_name', [state], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(rows.map(r => r.county_name));
+  });
+});
+
+app.get('/api/locations/cities', authenticateToken, async (req, res) => {
+  const { county } = req.query;
+  database.db.all('SELECT DISTINCT city FROM locations WHERE county_name = ? ORDER BY city', [county], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(rows.map(r => r.city));
+  });
 });
 
 app.get('/api/leads/meta', authenticateToken, async (req, res) => {
