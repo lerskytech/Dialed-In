@@ -61,7 +61,7 @@ function SearchForm({ onSearchComplete, setTotalCost }) {
   useEffect(() => {
     const fetchStates = async () => {
       try {
-        const response = await fetch('/api/locations/states', {
+        const response = await fetch('http://localhost:3001/api/locations/states', {
           headers: getAuthHeaders(),
         });
         const data = await response.json();
@@ -79,7 +79,7 @@ function SearchForm({ onSearchComplete, setTotalCost }) {
     const fetchCounties = async () => {
       if (!selectedState) return;
       try {
-        const response = await fetch(`/api/locations/counties?state=${selectedState}`, {
+        const response = await fetch(`http://localhost:3001/api/locations/counties?state=${selectedState}`, {
           headers: getAuthHeaders(),
         });
         const data = await response.json();
@@ -95,7 +95,7 @@ function SearchForm({ onSearchComplete, setTotalCost }) {
     const fetchCities = async () => {
       if (!selectedCounty) return;
       try {
-        const response = await fetch(`/api/locations/cities?county=${selectedCounty}`, {
+        const response = await fetch(`http://localhost:3001/api/locations/cities?county=${selectedCounty}`, {
           headers: getAuthHeaders(),
         });
         const data = await response.json();
@@ -116,7 +116,7 @@ function SearchForm({ onSearchComplete, setTotalCost }) {
     if (!selectedCity || categoriesToSearch.length === 0) return setError('Please select a city and at least one category');
     try {
       setSearching(true); setError(null); setSuccess(null);
-      const response = await fetch('/api/search', {
+      const response = await fetch('http://localhost:3001/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ cities: [selectedCity], categories: categoriesToSearch, maxLeads, apiKey })
