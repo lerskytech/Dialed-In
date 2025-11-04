@@ -1,5 +1,5 @@
 const serverless = require('serverless-http');
-const initialize = require('../../../backend/server');
+const initialize = require('../../api/server');
 
 module.exports.handler = async (event, context) => {
   const app = await initialize();
