@@ -4,7 +4,8 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const { seedDatabase } = require('./seed');
 
-const DB_PATH = path.join(__dirname, 'db.sqlite');
+// Use /tmp directory for the database in a serverless environment
+const DB_PATH = path.join('/tmp', 'db.sqlite');
 let db;
 
 function initDb() {
