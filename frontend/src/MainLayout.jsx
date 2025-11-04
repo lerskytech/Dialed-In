@@ -5,6 +5,7 @@ import Header from './Header';
 import { useAuth } from './AuthContext';
 
 const MainLayout = () => {
+  const [totalCost, setTotalCost] = useState(0);
   const { logout, userName, getAuthHeaders } = useAuth();
 
   return (
@@ -12,10 +13,11 @@ const MainLayout = () => {
       <Header 
         userName={userName}
         onLogout={logout} 
+        totalCost={totalCost}
       />
       <main>
         <Routes>
-          <Route path="/" element={<Dashboard getAuthHeaders={getAuthHeaders} />} />
+          <Route path="/" element={<Dashboard getAuthHeaders={getAuthHeaders} setTotalCost={setTotalCost} />} />
           {/* Other nested routes can go here */}
         </Routes>
       </main>

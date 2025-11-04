@@ -45,7 +45,7 @@ const selectStyles = {
   singleValue: (base) => ({ ...base, color: 'white' }),
 };
 
-function SearchForm({ onSearchComplete }) {
+function SearchForm({ onSearchComplete, setTotalCost }) {
   const { getAuthHeaders, token } = useAuth();
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -73,6 +73,10 @@ function SearchForm({ onSearchComplete }) {
   };
 
   const handleSearch = async () => {
+    const apiKey = localStorage.getItem('apiKey');
+    if (!apiKey) {
+      return setError('Please save your API key before searching.');
+    }
     const citiesToSearch = selectedLocations.map(loc => loc.value);
     const categoriesToSearch = selectedCategories.map(c => c.value);
     if (citiesToSearch.length === 0 || categoriesToSearch.length === 0) return setError('Please select at least one location and one category');
@@ -81,7 +85,7 @@ function SearchForm({ onSearchComplete }) {
       const response = await fetch('http://localhost:3001/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        body: JSON.stringify({ cities: citiesToSearch, categories: categoriesToSearch, maxLeads })
+        body: JSON.stringify({ cities: citiesToSearch, categories: categoriesToSearch, maxLeads, apiKey })
       });
       const result = await response.json();
       if (!response.ok) {
@@ -90,6 +94,8 @@ function SearchForm({ onSearchComplete }) {
       const newCount = result.newLeads || result.data.length;
       const totalFound = result.totalFound || result.data.length;
       setSuccess(newCount === totalFound ? `Found ${newCount} new leads!` : `Found ${newCount} new leads (${totalFound - newCount} were duplicates)`);
+      const cost = (totalFound / 1000) * 17; // $17 per 1000 results
+      setTotalCost(prevCost => prevCost + cost);
       onSearchComplete();
     } catch (err) {
       setError(err.message);

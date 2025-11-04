@@ -6,7 +6,7 @@ import Pagination from './components/Pagination';
 
 import { useAuth } from './AuthContext';
 
-function Dashboard() {
+function Dashboard({ setTotalCost }) {
   const { getAuthHeaders, token } = useAuth();
 
     const [filters, setFilters] = useState({
@@ -24,6 +24,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [totalCost, setLocalTotalCost] = useState(0);
   const [filterOptions, setFilterOptions] = useState({ cities: [], categories: [] });
 
   useEffect(() => {
@@ -168,7 +169,7 @@ function Dashboard() {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <SearchForm onSearchComplete={loadLeads} />
+      <SearchForm onSearchComplete={loadLeads} setTotalCost={setTotalCost} />
 
       <div className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 sm:p-6 mb-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-3 gap-4 sm:gap-2">

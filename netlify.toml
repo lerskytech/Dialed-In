@@ -4,14 +4,14 @@
   # Set the base directory to the frontend folder
   base = "frontend"
   # The command to build the frontend application
-  command = "npm run build"
+  command = "node ../backend/build-db.js && npm run build"
   # The directory that contains the built assets, relative to the base directory
   publish = "dist"
 
 [functions]
   # The directory for serverless functions, relative to the root of the repository
   directory = "frontend/netlify/functions"
-  included_files = ["backend/uscities.csv"]
+  included_files = ["backend/db.sqlite"]
 
 # Redirects for API calls and single-page application routing
 [[redirects]]
