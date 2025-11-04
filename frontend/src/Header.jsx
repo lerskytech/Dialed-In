@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from './assets/SL.png';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { ChevronDownIcon, CogIcon, LogoutIcon } from '@heroicons/react/solid';
@@ -10,7 +11,7 @@ const Header = ({ userName, onLogout, totalCost }) => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex items-center space-x-3">
-              <img src="/src/assets/logo.svg" alt="Spree Leads Logo" className="h-10" />
+              <img src={logo} alt="Spree Leads Logo" className="h-10" />
             </div>
           </div>
                     <div className="flex items-center space-x-4">
