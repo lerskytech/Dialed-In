@@ -10,10 +10,28 @@ const Header = ({ userName, onLogout }) => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold text-white">Dialed-In</h1>
+              <h1 className="text-2xl font-bold text-white">Spree Leads</h1>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                placeholder="Enter API Key"
+                className="bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                id="apiKeyInput"
+              />
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md text-sm"
+                onClick={() => {
+                  const apiKey = document.getElementById('apiKeyInput').value;
+                  localStorage.setItem('apiKey', apiKey);
+                  alert('API Key Saved!');
+                }}
+              >
+                Save
+              </button>
+            </div>
             <Menu as="div" className="relative inline-block text-left">
               <div>
                 <Menu.Button className="inline-flex justify-center w-full rounded-md border border-slate-600 px-4 py-2 bg-slate-700 text-sm font-medium text-gray-300 hover:bg-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">

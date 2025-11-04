@@ -28,7 +28,7 @@ function initDb() {
           console.log('✅ SQLite DB tables are ready.');
           // Seed the database if it's empty
           seedDatabase(db)
-            //.then(() => seedLocations(db)) // Temporarily disable location seeding
+            .then(() => seedLocations(db)) // Seed locations after other tables are ready
             .then(() => resolve(db))
             .catch(reject);
         }

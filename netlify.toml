@@ -11,6 +11,7 @@
 [functions]
   # The directory for serverless functions, relative to the root of the repository
   directory = "frontend/netlify/functions"
+  included_files = ["backend/uscities.csv"]
 
 # Redirects for API calls and single-page application routing
 [[redirects]]
