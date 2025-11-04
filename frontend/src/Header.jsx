@@ -10,7 +10,7 @@ const Header = ({ userName, onLogout, totalCost }) => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold text-white">Spree Leads</h1>
+              <img src="/src/assets/logo.svg" alt="Spree Leads Logo" className="h-10" />
             </div>
           </div>
                     <div className="flex items-center space-x-4">
