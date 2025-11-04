@@ -16,8 +16,6 @@ yarn-error.log*
 .pnp.js
 
 # Database files
-*.sqlite
-*.sqlite3
 
 # Temporary & Backup files
 *.bak

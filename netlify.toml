@@ -4,7 +4,7 @@
   # Set the base directory to the frontend folder
   base = "frontend"
   # The command to build the frontend application
-  command = "npm install && node api/build-db.js && npm run build"
+  command = "npm install && npm run build"
   # The directory that contains the built assets, relative to the base directory
   publish = "dist"
 

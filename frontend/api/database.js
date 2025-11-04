@@ -1,4 +1,4 @@
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const path = require('path');
 
 // The database is now built during the deployment process.
@@ -12,14 +12,14 @@ function initDb() {
       return resolve(db);
     }
 
-    db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_READONLY, (err) => {
-      if (err) {
-        console.error('❌ Failed to connect to SQLite DB:', err.message);
-        return reject(err);
-      }
+    try {
+      db = new Database(DB_PATH, { readonly: true });
       console.log('✅ SQLite DB connection established.');
       resolve(db);
-    });
+    } catch (err) {
+      console.error('❌ Failed to connect to SQLite DB:', err.message);
+      reject(err);
+    }
   });
 }
 

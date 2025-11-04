@@ -1,4 +1,4 @@
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 const csv = require('csv-parser');
@@ -11,13 +11,7 @@ if (fs.existsSync(DB_PATH)) {
   console.log('🗑️ Deleted existing database file.');
 }
 
-const db = new sqlite3.Database(DB_PATH, (err) => {
-  if (err) {
-    console.error('❌ Failed to create SQLite DB:', err.message);
-    process.exit(1);
-  }
-  console.log('✅ SQLite DB created successfully.');
-});
+const db = new Database(DB_PATH, { verbose: console.log });
 
 const sampleLeads = [
   {
@@ -50,7 +44,7 @@ const sampleLeads = [
 
 function runSchema(db) {
   return new Promise((resolve, reject) => {
-    db.serialize(() => {
+    db.transaction(() => {
       console.log('🚀 Creating database schema...');
       db.run(`
         CREATE TABLE IF NOT EXISTS leads (

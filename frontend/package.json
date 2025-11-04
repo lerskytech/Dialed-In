@@ -30,7 +30,7 @@
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
     "sqlite": "^5.0.1",
-    "sqlite3": "^5.1.7",
+    "better-sqlite3": "^11.1.2",
     "stripe": "^18.5.0"
   },
   "devDependencies": {

@@ -168,32 +168,23 @@ app.post('/api/search', authenticateToken, async (req, res) => {
 });
 
 app.get('/api/locations/states', authenticateToken, async (req, res) => {
-  database.db.all('SELECT DISTINCT state_name FROM locations ORDER BY state_name', [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database error' });
-    }
-    res.json(rows.map(r => r.state_name));
-  });
+  const stmt = database.db.prepare('SELECT DISTINCT state_name FROM locations ORDER BY state_name');
+  const rows = stmt.all();
+  res.json(rows.map(r => r.state_name));
 });
 
 app.get('/api/locations/counties', authenticateToken, async (req, res) => {
   const { state } = req.query;
-  database.db.all('SELECT DISTINCT county_name FROM locations WHERE state_name = ? ORDER BY county_name', [state], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database error' });
-    }
-    res.json(rows.map(r => r.county_name));
-  });
+  const stmt = database.db.prepare('SELECT DISTINCT county_name FROM locations WHERE state_name = ? ORDER BY county_name');
+  const rows = stmt.all(state);
+  res.json(rows.map(r => r.county_name));
 });
 
 app.get('/api/locations/cities', authenticateToken, async (req, res) => {
   const { county } = req.query;
-  database.db.all('SELECT DISTINCT city FROM locations WHERE county_name = ? ORDER BY city', [county], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database error' });
-    }
-    res.json(rows.map(r => r.city));
-  });
+  const stmt = database.db.prepare('SELECT DISTINCT city FROM locations WHERE county_name = ? ORDER BY city');
+  const rows = stmt.all(county);
+  res.json(rows.map(r => r.city));
 });
 
 app.get('/api/leads/meta', authenticateToken, async (req, res) => {
