@@ -1,0 +1,45 @@
+[build]
+  base = "frontend"
+  command = "npm install && npm run build"
+  publish = "dist"
+  environment = { NODE_VERSION = "18" }
+
+[build.environment]
+  # Required environment variables
+  JWT_SECRET = "your_secure_jwt_secret"
+  STRIPE_SECRET_KEY = "your_stripe_secret_key"
+  STRIPE_PRICE_ID = "your_stripe_price_id"
+  STRIPE_WEBHOOK_SECRET = "your_stripe_webhook_secret"
+  
+  # Google Places API Key - Replace with your actual key
+  GOOGLE_PLACES_API_KEY = "your_google_places_api_key"
+  
+  # Authentication tokens
+  DIALED_IN_ACCESS_TOKEN_1 = "dialed-in-partner-access-2024"
+  DIALED_IN_ACCESS_TOKEN_2 = "dialed-in-business-partner-2024"
+
+[functions]
+  directory = "netlify/functions"
+  included_files = ["api/db.sqlite"]
+  node_bundler = "esbuild"
+
+# Redirects for SPA and API
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.stripe.com;"

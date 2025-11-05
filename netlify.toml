@@ -1,28 +1,7 @@
-# Netlify configuration for a monorepo
-
 [build]
-  # Set the base directory to the frontend folder
   base = "frontend"
-  # The command to build the frontend application
   command = "npm install && npm run build"
-  # The directory that contains the built assets, relative to the base directory
-  publish = "dist"
-
-[functions]
-  # The directory for serverless functions, relative to the root of the repository
-  directory = "netlify/functions"
-  included_files = ["api/db.sqlite"]
-
-# Redirects for API calls and single-page application routing
-[[redirects]]
-  from = "/api/auth/*"
-  to = "/.netlify/functions/auth/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+  publish = "frontend/dist"
 
 [[redirects]]
   from = "/*"

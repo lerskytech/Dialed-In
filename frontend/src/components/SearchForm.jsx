@@ -58,54 +58,71 @@ function SearchForm({ onSearchComplete, setTotalCost }) {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
+  // Base URL for API requests - use relative URL in production, absolute in development
+  const API_BASE_URL = import.meta.env.DEV 
+    ? 'http://localhost:3001/api' 
+    : '/api';
+
   useEffect(() => {
     const fetchStates = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/locations/states', {
+        const response = await fetch(`${API_BASE_URL}/locations/states`, {
           headers: getAuthHeaders(),
         });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         setStates(data);
       } catch (err) {
-        setError('Failed to load states.');
+        console.error('Error fetching states:', err);
+        setError('Failed to load states. Please check if the server is running.');
       }
     };
     if (token) {
       fetchStates();
     }
-  }, [token, getAuthHeaders]);
+  }, [token, getAuthHeaders, API_BASE_URL]);
 
   useEffect(() => {
     const fetchCounties = async () => {
       if (!selectedState) return;
       try {
-        const response = await fetch(`http://localhost:3001/api/locations/counties?state=${selectedState}`, {
+        const response = await fetch(`${API_BASE_URL}/locations/counties?state=${encodeURIComponent(selectedState)}`, {
           headers: getAuthHeaders(),
         });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         setCounties(data);
       } catch (err) {
-        setError('Failed to load counties.');
+        console.error('Error fetching counties:', err);
+        setError('Failed to load counties. Please try again.');
       }
     };
     fetchCounties();
-  }, [selectedState, getAuthHeaders]);
+  }, [selectedState, getAuthHeaders, API_BASE_URL]);
 
   useEffect(() => {
     const fetchCities = async () => {
       if (!selectedCounty) return;
       try {
-        const response = await fetch(`http://localhost:3001/api/locations/cities?county=${selectedCounty}`, {
+        const response = await fetch(`${API_BASE_URL}/locations/cities?county=${encodeURIComponent(selectedCounty)}`, {
           headers: getAuthHeaders(),
         });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         setCities(data);
       } catch (err) {
-        setError('Failed to load cities.');
+        console.error('Error fetching cities:', err);
+        setError('Failed to load cities. Please try again.');
       }
     };
     fetchCities();
-  }, [selectedCounty, getAuthHeaders]);
+  }, [selectedCounty, getAuthHeaders, API_BASE_URL]);
 
   const handleSearch = async () => {
     const apiKey = localStorage.getItem('apiKey');
@@ -116,15 +133,18 @@ function SearchForm({ onSearchComplete, setTotalCost }) {
     if (!selectedCity || categoriesToSearch.length === 0) return setError('Please select a city and at least one category');
     try {
       setSearching(true); setError(null); setSuccess(null);
-      const response = await fetch('http://localhost:3001/api/search', {
+      const response = await fetch(`${API_BASE_URL}/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ cities: [selectedCity], categories: categoriesToSearch, maxLeads, apiKey })
       });
-      const result = await response.json();
+      
       if (!response.ok) {
-        throw new Error(result.message || 'Search failed. Please check your settings.');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Search failed. Please check your settings.');
       }
+      
+      const result = await response.json();
       const newCount = result.newLeads || result.data.length;
       const totalFound = result.totalFound || result.data.length;
       setSuccess(newCount === totalFound ? `Found ${newCount} new leads!` : `Found ${newCount} new leads (${totalFound - newCount} were duplicates)`);
